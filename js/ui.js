@@ -51,7 +51,7 @@ export function render() {
 }
 
 /**
- * Affiche le contenu de la carte actuelle.
+ * Affiche le contenu de la carte actuelle et lance le rendu LaTeX.
  */
 export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
@@ -76,6 +76,18 @@ export function showCard() {
         DOM.cardFront.innerHTML = marked.parse(answerText || '');
         DOM.cardBack.innerHTML = marked.parse(questionText || '');
     }
+
+    // --- MODIFICATION POUR LATEX ---
+    // On demande à KaTeX de transformer le texte en formules
+    if (window.renderMathInElement) {
+        const options = { delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ]};
+        window.renderMathInElement(DOM.cardFront, options);
+        window.renderMathInElement(DOM.cardBack, options);
+    }
+    // --- FIN DE LA MODIFICATION ---
 
     DOM.answerButtons.classList.add('hidden');
     adjustCardHeight();

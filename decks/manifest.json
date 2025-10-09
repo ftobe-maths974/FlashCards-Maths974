@@ -8,9 +8,15 @@
         "type": "dossier",
         "contenu": [
           {
-            "nom": "Les Nombres jusqu'à 100",
-            "type": "fichier",
-            "path": "cycle2/nombres/nombres_100.md"
+            "nom": "Tables de multiplication",
+            "type": "dossier",
+            "contenu": [
+              {
+                "nom": "Table de 2",
+                "type": "fichier",
+                "path": "cycle2/nombres/tables-multiplication/table_de_2.md"
+              }
+            ]
           },
           {
             "nom": "Addition & Soustraction",
@@ -43,28 +49,8 @@
             "nom": "Fractions & Décimaux",
             "type": "fichier",
             "path": "cycle3/nombres/fractions_decimaux.md"
-          },
-          {
-            "nom": "Les 4 Opérations",
-            "type": "fichier",
-            "path": "cycle3/nombres/operations_4.md"
-          },
-          {
-            "nom": "Proportionnalité",
-            "type": "fichier",
-            "path": "cycle3/nombres/proportionnalite.md"
           }
         ]
-      },
-      {
-        "nom": "📏 Grandeurs et mesures",
-        "type": "dossier",
-        "contenu": []
-      },
-      {
-        "nom": "🧭 Espace et géométrie",
-        "type": "dossier",
-        "contenu": []
       }
     ]
   }

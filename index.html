@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards SRS</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Flashcards SRS</h1>
+            <button id="theme-toggle" title="Changer le thème">🌙</button>
+        </header>
+        <main>
+            <div id="welcome-screen">
+                <h2>Bibliothèque de Decks</h2>
+                <p>Choisissez un deck à étudier.</p>
+                <ul id="deck-tree">
+                    </ul>
+            </div>
+            <div id="app-screen" class="hidden">
+                <div id="deck-info">
+                    <span id="deck-name"></span> | <span id="deck-progress"></span>
+                </div>
+                <div id="card-container">
+                    <div class="card-inner">
+                        <div class="card-face card-front" id="card-front"></div>
+                        <div class="card-face card-back" id="card-back"></div>
+                    </div>
+                </div>
+                <div id="answer-buttons" class="hidden">
+                    <button class="btn" id="btn-again">À revoir (1)</button>
+                    <button class="btn" id="btn-hard">Difficile (2)</button>
+                    <button class="btn" id="btn-good">Correct (3)</button>
+                    <button class="btn" id="btn-easy">Facile (4)</button>
+                </div>
+                
+                <div id="no-cards-message" class="hidden">
+                    <p>Bravo ! Aucune carte à réviser pour aujourd'hui.</p>
+                    <button class="btn" id="btn-back-to-library" style="margin-top: 16px;">Retourner à la bibliothèque</button>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-quit" id="btn-quit-session">Quitter & retourner au menu</button>
+                </div>
+            </div>
+        </main>
+        
+        <div id="study-mode-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3>Choisir le mode d'affichage</h3>
+                <div class="radio-group">
+                    <label><input type="radio" name="study-mode" value="recto" checked> Afficher le Recto (Question)</label>
+                    <label><input type="radio" name="study-mode" value="verso"> Afficher le Verso (Réponse)</label>
+                    <label><input type="radio" name="study-mode" value="aleatoire"> Aléatoire</label>
+                </div>
+                <button class="btn" id="start-session-btn">Lancer la session</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

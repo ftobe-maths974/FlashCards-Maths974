@@ -4,8 +4,8 @@
  */
 
 // --- Import des modules ---
-import { appState, loadState, resetApp, initializeDeck, saveState } from './state.js';
-import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, showCard } from './ui.js';
+import { appState, initializeDeck, resetApp, saveCardProgress, resetDeckProgress } from './state.js';
+import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard } from './ui.js';
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
 
@@ -29,11 +29,16 @@ async function startNewSession() {
     const selectedMode = document.querySelector('input[name="study-mode"]:checked').value;
     DOM.studyModeModal.classList.add('hidden');
 
-    if (deckToLoad) {
+    if (deckToLoad && deckToLoad.info) {
         if (deckToLoad.type === 'permanent') {
             const deckData = await fetchDeckFile(deckToLoad.info.path);
-            if (deckData) {
-                initializeDeck(deckData, deckToLoad.info.nom, selectedMode);
+            if (deckData && deckData.length > 0) {
+                // Étape 1 : On hydrate le deck (contenu + progression)
+                initializeDeck(deckData, deckToLoad.info.nom, deckToLoad.info.path, selectedMode);
+                // Étape 2 : On commande à l'interface de se mettre à jour
+                render();
+            } else {
+                alert('Ce deck est vide ou n\'a pas pu être lu.');
             }
         }
         deckToLoad = null;
@@ -46,8 +51,11 @@ async function startNewSession() {
  */
 function handleCardAnswer(quality) {
     const card = appState.dueCards[appState.currentCardIndex];
-    processAnswer(card, quality); // Met à jour la carte via le module SRS
-    saveState();
+    // Étape 1 : On calcule le nouvel état de la carte
+    processAnswer(card, quality);
+    // Étape 2 : On sauvegarde la progression de CETTE carte
+    saveCardProgress(card);
+    // Étape 3 : On met à jour l'affichage
     render();
 }
 
@@ -59,17 +67,20 @@ function setupEventListeners() {
     DOM.themeToggle.addEventListener('click', toggleTheme);
 
     // Navigation et session
-    DOM.backToLibraryBtn.addEventListener('click', resetApp);
+    DOM.backToLibraryBtn.addEventListener('click', () => {
+        resetApp(); // Réinitialise l'état en mémoire
+        render();   // Met à jour l'affichage
+    });
     DOM.quitSessionBtn.addEventListener('click', () => {
         if (confirm("Êtes-vous sûr de vouloir quitter ? La progression sur les cartes déjà vues est sauvegardée.")) {
             resetApp();
+            render();
         }
     });
 
     // Modale de choix de mode
     DOM.startSessionBtn.addEventListener('click', startNewSession);
     DOM.studyModeModal.addEventListener('click', (e) => {
-        // Permet de fermer la modale en cliquant à l'extérieur
         if (e.target === DOM.studyModeModal) {
             DOM.studyModeModal.classList.add('hidden');
         }
@@ -103,15 +114,13 @@ function setupEventListeners() {
  * Fonction d'initialisation de l'application.
  */
 async function init() {
-    applySavedTheme();
     setupEventListeners();
+    applySavedTheme();
     
     const manifest = await fetchDeckLibrary();
     buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
     
-    if (loadState()) {
-        render();
-    }
+    // On ne charge plus d'état au démarrage, l'application commence toujours sur l'accueil.
 }
 
 // --- Lancement de l'application ---

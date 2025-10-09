@@ -77,8 +77,6 @@ export function showCard() {
         DOM.cardBack.innerHTML = marked.parse(questionText || '');
     }
 
-    // --- MODIFICATION POUR LATEX ---
-    // On demande à KaTeX de transformer le texte en formules
     if (window.renderMathInElement) {
         const options = { delimiters: [
             {left: '$$', right: '$$', display: true},
@@ -87,7 +85,6 @@ export function showCard() {
         window.renderMathInElement(DOM.cardFront, options);
         window.renderMathInElement(DOM.cardBack, options);
     }
-    // --- FIN DE LA MODIFICATION ---
 
     DOM.answerButtons.classList.add('hidden');
     adjustCardHeight();
@@ -133,6 +130,7 @@ export function buildTreeMenu(parentElement, items, onFileClick) {
             li.appendChild(subUl);
             span.onclick = () => li.classList.toggle('collapsed');
             if (item.contenu && item.contenu.length > 0) {
+                // CORRECTION ICI : on passe bien le onFileClick à l'appel récursif
                 buildTreeMenu(subUl, item.contenu, onFileClick);
             }
         } else { // type 'fichier'

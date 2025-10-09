@@ -34,12 +34,16 @@ export function render() {
     } else {
         DOM.welcomeScreen.classList.add('hidden');
         DOM.appScreen.classList.remove('hidden');
-
+        
+        const today = new Date().toISOString().split('T')[0];
+        appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
+        
         DOM.deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
         const dueCount = appState.dueCards.length;
         DOM.deckProgressEl.textContent = `À réviser: ${dueCount}`;
         
         if (dueCount > 0) {
+            appState.currentCardIndex = 0;
             showCard();
             DOM.noCardsMessage.classList.add('hidden');
         } else {
@@ -69,12 +73,14 @@ export function showCard() {
         showFrontFirst = Math.random() < 0.5;
     }
 
+    // --- CORRECTION FINALE ---
+    // On précise "window.marked" pour accéder à la librairie globale
     if (showFrontFirst) {
-        DOM.cardFront.innerHTML = marked.parse(questionText || '');
-        DOM.cardBack.innerHTML = marked.parse(answerText || '');
+        DOM.cardFront.innerHTML = window.marked.parse(questionText || '');
+        DOM.cardBack.innerHTML = window.marked.parse(answerText || '');
     } else {
-        DOM.cardFront.innerHTML = marked.parse(answerText || '');
-        DOM.cardBack.innerHTML = marked.parse(questionText || '');
+        DOM.cardFront.innerHTML = window.marked.parse(answerText || '');
+        DOM.cardBack.innerHTML = window.marked.parse(questionText || '');
     }
 
     if (window.renderMathInElement) {
@@ -130,7 +136,6 @@ export function buildTreeMenu(parentElement, items, onFileClick) {
             li.appendChild(subUl);
             span.onclick = () => li.classList.toggle('collapsed');
             if (item.contenu && item.contenu.length > 0) {
-                // CORRECTION ICI : on passe bien le onFileClick à l'appel récursif
                 buildTreeMenu(subUl, item.contenu, onFileClick);
             }
         } else { // type 'fichier'

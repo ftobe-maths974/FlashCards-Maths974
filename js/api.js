@@ -1,67 +1,46 @@
 /**
- * Ce module gère l'état global de l'application (appState)
- * et toutes les interactions avec le localStorage.
+ * Ce module gère toutes les communications avec les fichiers externes (API Fetch).
+ * Il est responsable de charger la bibliothèque de decks et le contenu de chaque deck.
  */
 
-// L'état initial de l'application, exporté pour être accessible par les autres modules.
-export let appState = { 
-    deckName: null,
-    cards: [],
-    dueCards: [],
-    currentCardIndex: -1,
-    studyMode: 'recto' // 'recto', 'verso', or 'aleatoire'
-};
+import { parseMarkdownDeck } from './utils.js';
 
 /**
- * Sauvegarde l'état actuel de l'application dans le localStorage.
+ * Charge le fichier manifeste qui décrit l'arborescence de la bibliothèque de decks.
+ * @returns {Promise<Array>} Une promesse qui se résout avec le contenu du manifest.json.
  */
-export function saveState() {
-    localStorage.setItem('flashcard_app_state', JSON.stringify(appState));
-}
-
-/**
- * Charge l'état de l'application depuis le localStorage.
- * @returns {boolean} Vrai si un état a été chargé, faux sinon.
- */
-export function loadState() {
-    const savedState = localStorage.getItem('flashcard_app_state');
-    if (savedState) {
-        appState = JSON.parse(savedState);
-        // Assure la compatibilité si d'anciennes versions de l'état sont sauvegardées
-        if (typeof appState.studyMode === 'undefined') {
-            appState.studyMode = 'recto';
+export async function fetchDeckLibrary() {
+    try {
+        const response = await fetch('decks/manifest.json');
+        if (!response.ok) {
+            throw new Error(`Erreur réseau: ${response.statusText}`);
         }
-        return true;
+        const manifest = await response.json();
+        return manifest;
+    } catch (error) {
+        console.error("Impossible de charger la bibliothèque de decks. Vérifiez que 'decks/manifest.json' existe.", error);
+        // Retourne un tableau vide en cas d'erreur pour ne pas bloquer l'interface
+        return [];
     }
-    return false;
 }
 
 /**
- * Réinitialise l'état de l'application et nettoie le localStorage.
+ * Charge et parse le contenu d'un fichier de deck Markdown (.md) spécifique.
+ * @param {string} path Le chemin relatif du fichier .md dans le dossier /decks/.
+ * @returns {Promise<Array<Object>>} Une promesse qui se résout avec un tableau d'objets carte.
  */
-export function resetApp() {
-    appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1, studyMode: 'recto' };
-    localStorage.removeItem('flashcard_app_state');
-}
-
-/**
- * Initialise un nouveau deck, prépare les cartes et met à jour l'état.
- * @param {Array<Object>} cardsData Le tableau de cartes brutes ({ Question, Réponse }).
- * @param {string} deckName Le nom du deck.
- * @param {string} mode Le mode d'étude choisi ('recto', 'verso', 'aleatoire').
- */
-export function initializeDeck(cardsData, deckName, mode) {
-    const now = new Date().toISOString().split('T')[0];
-    appState.deckName = deckName;
-    appState.studyMode = mode;
-    appState.cards = cardsData.map((card, index) => ({
-        id_unique: `${deckName}-${index}`,
-        Question: card.Question,
-        Réponse: card.Réponse,
-        prochaine_revision: now,
-        intervalle: 0,
-        facteur_facilite: 2.5,
-        statut: 'nouvelle'
-    }));
-    saveState();
+export async function fetchDeckFile(path) {
+    try {
+        const response = await fetch(`decks/${path}`);
+        if (!response.ok) {
+            throw new Error(`Erreur réseau: ${response.statusText}`);
+        }
+        const mdText = await response.text();
+        const cardsData = parseMarkdownDeck(mdText);
+        return cardsData;
+    } catch (error) {
+        console.error(`Erreur lors du chargement du deck ${path}`, error);
+        alert(`Erreur lors du chargement du deck. Vérifiez la console pour plus de détails.`);
+        return [];
+    }
 }

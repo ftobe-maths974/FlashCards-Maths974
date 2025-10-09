@@ -1,0 +1,71 @@
+[
+  {
+    "nom": "📐 Mathématiques - Cycle 2 (CP, CE1, CE2)",
+    "type": "dossier",
+    "contenu": [
+      {
+        "nom": "🔢 Nombres et calculs",
+        "type": "dossier",
+        "contenu": [
+          {
+            "nom": "Les Nombres jusqu'à 100",
+            "type": "fichier",
+            "path": "cycle2/nombres/nombres_100.md"
+          },
+          {
+            "nom": "Addition & Soustraction",
+            "type": "fichier",
+            "path": "cycle2/nombres/operations.md"
+          }
+        ]
+      },
+      {
+        "nom": "📏 Grandeurs et mesures",
+        "type": "dossier",
+        "contenu": []
+      },
+      {
+        "nom": "🧭 Espace et géométrie",
+        "type": "dossier",
+        "contenu": []
+      }
+    ]
+  },
+  {
+    "nom": "📐 Mathématiques - Cycle 3 (CM1, CM2, 6e)",
+    "type": "dossier",
+    "contenu": [
+      {
+        "nom": "🔢 Nombres et calculs",
+        "type": "dossier",
+        "contenu": [
+          {
+            "nom": "Fractions & Décimaux",
+            "type": "fichier",
+            "path": "cycle3/nombres/fractions_decimaux.md"
+          },
+          {
+            "nom": "Les 4 Opérations",
+            "type": "fichier",
+            "path": "cycle3/nombres/operations_4.md"
+          },
+          {
+            "nom": "Proportionnalité",
+            "type": "fichier",
+            "path": "cycle3/nombres/proportionnalite.md"
+          }
+        ]
+      },
+      {
+        "nom": "📏 Grandeurs et mesures",
+        "type": "dossier",
+        "contenu": []
+      },
+      {
+        "nom": "🧭 Espace et géométrie",
+        "type": "dossier",
+        "contenu": []
+      }
+    ]
+  }
+]

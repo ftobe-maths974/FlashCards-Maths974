@@ -73,6 +73,7 @@ export function initializeDeck(cardsData, deckName, deckPath, mode) {
             ...progress // On fusionne le contenu et la progression
         };
     });
+    console.log('État des cartes après chargement de la progression :', appState.cards);
 }
 
 /**
@@ -111,4 +112,5 @@ export function resetDeckProgress(deckPath) {
             // Il faudra appeler render() depuis main.js pour rafraîchir l'UI
         }
     }
+
 }

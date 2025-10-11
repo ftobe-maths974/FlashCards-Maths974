@@ -4,27 +4,25 @@
  */
 
 // --- Import des modules ---
-import { getDecksWithStatus, appState, initializeDeck, resetApp, resetDeckProgress, saveCurrentDeckProgress } from './state.js';
-import { DOM, render, buildAndShowLibrary, promptStudyMode, toggleTheme, applySavedTheme, flipCard, prepareNextCard } from './ui.js';
+import { appState, initializeDeck, resetApp, resetDeckProgress, getDecksWithStatus } from './state.js';
+import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, prepareNextCard } from './ui.js';
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
-
-/**
- * Charge la bibliothèque, calcule le statut des decks et affiche le menu.
- * Cette fonction sera maintenant appelée au démarrage ET en quittant une session.
- */
-async function buildAndShowLibrary() {
-    let manifest = await fetchDeckLibrary();
-    manifest = await getDecksWithStatus(manifest);
-    // On vide l'ancien menu avant de reconstruire
-    DOM.deckTreeContainer.innerHTML = ''; 
-    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
-}
-
 
 // --- Gestionnaires d'événements ---
 
 let deckToLoad = null; // Stockage temporaire des infos du deck à charger
+
+/**
+ * Charge la bibliothèque, calcule le statut des decks et affiche le menu.
+ * Cette fonction est appelée au démarrage ET en quittant une session pour tout mettre à jour.
+ */
+async function buildAndShowLibrary() {
+    let manifest = await fetchDeckLibrary();
+    manifest = await getDecksWithStatus(manifest);
+    DOM.deckTreeContainer.innerHTML = ''; // On vide l'ancien menu
+    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
+}
 
 /**
  * Gère le clic sur un fichier de deck dans l'arborescence.
@@ -46,9 +44,7 @@ async function startNewSession() {
         if (deckToLoad.type === 'permanent') {
             const deckData = await fetchDeckFile(deckToLoad.info.path);
             if (deckData && deckData.length > 0) {
-                // Étape 1 : On hydrate le deck (contenu + progression)
                 initializeDeck(deckData, deckToLoad.info.nom, deckToLoad.info.path, selectedMode);
-                // Étape 2 : On commande à l'interface de se mettre à jour
                 render();
             } else {
                 alert('Ce deck est vide ou n\'a pas pu être lu.');
@@ -60,22 +56,16 @@ async function startNewSession() {
 
 /**
  * Gère la réponse de l'utilisateur à une carte.
- * @param {number} quality La qualité de la réponse (1-4).
  */
 function handleCardAnswer(quality) {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
-    // ÉTAPE 1 : On déclenche la disparition IMMÉDIATEMENT au clic.
     DOM.answerButtons.classList.add('hidden');
     const cardInner = DOM.cardContainer.querySelector('.card-inner');
     cardInner.style.opacity = '0';
 
-    // ÉTAPE 2 : On attend la fin de l'animation de disparition (200ms).
     setTimeout(() => {
-        // --- La carte est maintenant invisible ---
-
-        // ÉTAPE 3 : On exécute toute la logique de l'application (SRS, file d'attente...).
         processAnswer(card, quality);
         
         if (quality <= 2) {
@@ -87,33 +77,27 @@ function handleCardAnswer(quality) {
             appState.currentCardIndex++;
         }
 
-        // ÉTAPE 4 : On décide de la suite.
         if (appState.currentCardIndex < appState.dueCards.length) {
-            // S'il y a une carte suivante :
-            // a) On prépare la nouvelle carte (remplissage, etc.) pendant qu'elle est invisible.
-            prepareNextCard(); 
-            // b) On déclenche sa réapparition.
+            prepareNextCard();
             cardInner.style.opacity = '1';
         } else {
-            // S'il n'y a plus de cartes, on affiche l'écran de fin.
             render();
         }
-
-    }, 200); // Cette durée DOIT correspondre à la transition d'opacité dans votre CSS.
+    }, 200);
 }
 
+/**
+ * Met en place tous les écouteurs d'événements de l'application.
+ */
 function setupEventListeners() {
-    // Thème
     DOM.themeToggle.addEventListener('click', toggleTheme);
 
-    // Navigation et session
     DOM.quitSessionBtn.addEventListener('click', () => {
         resetApp();
         render();
         buildAndShowLibrary();
     });
 
-    // Modale de choix de mode
     DOM.startSessionBtn.addEventListener('click', startNewSession);
     DOM.studyModeModal.addEventListener('click', (e) => {
         if (e.target === DOM.studyModeModal) {
@@ -121,7 +105,6 @@ function setupEventListeners() {
         }
     });
 
-    // Logique de la carte
     DOM.cardContainer.addEventListener('click', flipCard);
     DOM.answerButtons.addEventListener('click', (e) => {
         if (e.target.tagName !== 'BUTTON') return;
@@ -129,7 +112,6 @@ function setupEventListeners() {
         handleCardAnswer(qualityMap[e.target.id]);
     });
     
-    // Raccourcis clavier
     document.addEventListener('keydown', (e) => {
         if (appState.deckName && appState.dueCards.length > 0) {
             if (e.code === 'Space' && !DOM.cardContainer.classList.contains('is-flipped')) {
@@ -144,7 +126,6 @@ function setupEventListeners() {
         }
     });
 
-    // Listener pour le bouton de réinitialisation
     DOM.resetDeckBtn.addEventListener('click', () => {
         if (appState.deckPath) {
             resetDeckProgress(appState.deckPath, appState.deckName);
@@ -162,7 +143,7 @@ function setupEventListeners() {
 async function init() {
     setupEventListeners();
     applySavedTheme();
-    await buildAndShowLibrary(); // Appel initial
+    await buildAndShowLibrary();
 }
 
 // --- Lancement de l'application ---

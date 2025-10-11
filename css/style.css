@@ -229,6 +229,14 @@ h1 {
     content: '📄 ';
 }
 
+
+.help-section {
+    margin-bottom: 24px;
+    border: 1px solid var(--grey-light);
+    border-radius: var(--border-radius);
+    text-align: left; /* <--- AJOUTEZ CETTE LIGNE */
+}
+
 /* --- Modal Styles --- */
 .modal-overlay {
     position: fixed;

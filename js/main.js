@@ -95,20 +95,17 @@ function handleCardAnswer(quality) {
         render();
     }
 }
-/**
- * Met en place tous les écouteurs d'événements de l'application.
- */
+// DANS LE FICHIER js/main.js
+
 function setupEventListeners() {
     // Thème
     DOM.themeToggle.addEventListener('click', toggleTheme);
 
     // Navigation et session
-    // DANS LE FICHIER js/main.js
-
-     DOM.quitSessionBtn.addEventListener('click', () => {
-        resetApp(); // Sauvegarde la session et réinitialise l'état
-        render();   // Affiche l'écran d'accueil
-        buildAndShowLibrary(); // Reconstruit le menu avec les statuts à jour
+    DOM.quitSessionBtn.addEventListener('click', () => {
+        resetApp();
+        render();
+        buildAndShowLibrary();
     });
 
     // Modale de choix de mode
@@ -126,7 +123,7 @@ function setupEventListeners() {
         const qualityMap = { 'btn-again': 1, 'btn-hard': 2, 'btn-good': 3, 'btn-easy': 4 };
         handleCardAnswer(qualityMap[e.target.id]);
     });
-
+    
     // Raccourcis clavier
     document.addEventListener('keydown', (e) => {
         if (appState.deckName && appState.dueCards.length > 0) {
@@ -141,15 +138,14 @@ function setupEventListeners() {
             }
         }
     });
-    // Dans js/main.js, ajoutez ceci à la fonction setupEventListeners
 
-    // ... (à la fin de la fonction setupEventListeners)
+    // Listener pour le bouton de réinitialisation
     DOM.resetDeckBtn.addEventListener('click', () => {
         if (appState.deckPath) {
             resetDeckProgress(appState.deckPath, appState.deckName);
-            // Si le deck actuel a été réinitialisé, on retourne à l'accueil
             if (appState.deckName === null) {
                 render();
+                buildAndShowLibrary();
             }
         }
     });

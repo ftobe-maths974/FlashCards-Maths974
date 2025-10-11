@@ -51,12 +51,18 @@ async function startNewSession() {
  */
 function handleCardAnswer(quality) {
     const card = appState.dueCards[appState.currentCardIndex];
-    // Étape 1 : On calcule le nouvel état de la carte
     processAnswer(card, quality);
-    // Étape 2 : On sauvegarde la progression de CETTE carte
     saveCardProgress(card);
-    // Étape 3 : On met à jour l'affichage
-    render();
+
+    // On passe à la carte suivante
+    appState.currentCardIndex++;
+
+    // S'il reste des cartes, on affiche la suivante. Sinon, on rafraîchit pour afficher le message de fin.
+    if (appState.currentCardIndex < appState.dueCards.length) {
+        showCard();
+    } else {
+        render();
+    }
 }
 
 /**

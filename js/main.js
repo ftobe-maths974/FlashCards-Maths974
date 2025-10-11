@@ -52,6 +52,9 @@ async function startNewSession() {
 // DANS LE FICHIER js/main.js
 
 function handleCardAnswer(quality) {
+    const card = appState.dueCards[appState.currentCardIndex];
+    if (!card) return; // S'il n'y a pas de carte, on ne fait rien.
+    
     // --- ÉTAPE 1 : On cache IMMÉDIATEMENT tous les boutons ---
     DOM.answerButtons.classList.add('hidden');
     

@@ -287,6 +287,31 @@ h1 {
     margin-right: 10px;
 }
 
+/* AJOUTEZ CECI À LA FIN DE VOTRE FICHIER css/style.css */
+
+/* --- Styles pour le guide des boutons --- */
+.guide-list {
+    list-style: none; /* Enlève les puces de la liste */
+    padding-left: 0;
+}
+
+.guide-item {
+    display: flex;
+    align-items: center; /* Aligne verticalement le bouton et le texte */
+    gap: 8px; /* Espace entre le bouton et le texte */
+    margin-bottom: 12px; /* Espace entre chaque ligne du guide */
+}
+
+.guide-item .btn {
+    pointer-events: none; /* Rend les boutons non-cliquables */
+    flex-shrink: 0; /* Empêche les boutons de se déformer */
+    
+    /* On réduit un peu la taille pour une meilleure intégration */
+    padding: 4px 8px;
+    font-size: 13px;
+    margin: 0; /* Annule la marge par défaut des boutons */
+}
+
 #card-container.is-updating {
     /* Masque complètement l'élément et le retire du flux de la page */
     display: none !important; 

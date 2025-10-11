@@ -62,6 +62,9 @@ export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
+    const remainingCards = appState.dueCards.length - appState.currentCardIndex;
+    DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
+
     // ÉTAPE 1 : On applique la classe qui cache INSTANTANÉMENT la carte.
     DOM.cardContainer.classList.add('is-updating');
 

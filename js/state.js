@@ -93,8 +93,8 @@ export function resetApp() {
  * Réinitialise la progression d'un deck spécifique dans le localStorage.
  * @param {string} deckPath Le chemin du deck à réinitialiser.
  */
-export function resetDeckProgress(deckPath) {
-    if (confirm(`Êtes-vous sûr de vouloir réinitialiser toute la progression pour le deck "${deckPath}" ? Cette action est irréversible.`)) {
+export function resetDeckProgress(deckPath, deckName) {
+    if (confirm(`Êtes-vous sûr de vouloir réinitialiser la progression pour le deck "${deckName}" ? Cette action est irréversible.`)) {
         const allProgress = loadAllProgress();
         
         // On supprime toutes les clés qui commencent par le chemin du deck

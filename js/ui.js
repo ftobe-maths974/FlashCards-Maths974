@@ -55,47 +55,6 @@ export function render() {
 }
 
 /**
- * Affiche le contenu de la carte actuelle de manière séquentielle pour éviter les bugs visuels.
- */
-export function showCard() {
-    const card = appState.dueCards[appState.currentCardIndex];
-    if (!card) return;
-
-    const cardInner = DOM.cardContainer.querySelector('.card-inner');
-    cardInner.style.opacity = '0';
-    
-    const remainingCards = appState.dueCards.length - appState.currentCardIndex;
-    DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
-    
-    setTimeout(() => {
-        DOM.cardFront.innerHTML = '';
-        DOM.cardBack.innerHTML = '';
-        cardInner.style.transition = 'none';
-        DOM.cardContainer.classList.remove('is-flipped');
-        cardInner.offsetHeight;
-
-        let questionText = card.Question;
-        let answerText = card.Réponse;
-        let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
-
-        DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
-        DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
-
-        if (window.renderMathInElement) {
-            const options = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
-            window.renderMathInElement(DOM.cardFront, options);
-            window.renderMathInElement(DOM.cardBack, options);
-        }
-        adjustCardHeight();
-
-        setTimeout(() => {
-            cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
-            cardInner.style.opacity = '1';
-        }, 0);
-    }, 200);
-}
-
-/**
  * Gère l'animation de retournement de la carte.
  */
 export function flipCard() {
@@ -103,6 +62,65 @@ export function flipCard() {
         DOM.cardContainer.classList.add('is-flipped');
         DOM.answerButtons.classList.remove('hidden');
     }
+}
+
+/**
+ * Orchestre la transition visuelle entre deux cartes. C'est la solution au bug visuel.
+ */
+export function transitionToNextCard() {
+    const cardInner = DOM.cardContainer.querySelector('.card-inner');
+
+    // ÉTAPE 1 : On cache les boutons et on fait disparaître la carte actuelle.
+    DOM.answerButtons.classList.add('hidden');
+    cardInner.style.opacity = '0';
+    
+    // ÉTAPE 2 : On attend la fin de l'animation de disparition.
+    setTimeout(() => {
+        // --- La carte est maintenant invisible ---
+
+        // ÉTAPE 3 : On la retourne côté "question" SANS animation.
+        cardInner.style.transition = 'none';
+        DOM.cardContainer.classList.remove('is-flipped');
+        
+        // On force le navigateur à appliquer ce changement immédiatement.
+        cardInner.offsetHeight; 
+
+        // ÉTAPE 4 : On affiche la nouvelle carte (qui remplit la carte vide).
+        showCard(); 
+        
+        // ÉTAPE 5 : On réactive les animations et on fait réapparaître le tout.
+        cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
+        cardInner.style.opacity = '1';
+
+    }, 200); // Durée de l'animation d'opacité
+}
+
+/**
+ * Remplit la carte avec le contenu de la question/réponse actuelle.
+ * Ne gère plus d'animations, seulement le remplissage.
+ */
+export function showCard() {
+    const card = appState.dueCards[appState.currentCardIndex];
+    if (!card) return;
+
+    // Met à jour le compteur.
+    const remainingCards = appState.dueCards.length - appState.currentCardIndex;
+    DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
+
+    // Remplit le contenu.
+    let questionText = card.Question;
+    let answerText = card.Réponse;
+    let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
+
+    DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
+    DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
+
+    if (window.renderMathInElement) {
+        const options = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
+        window.renderMathInElement(DOM.cardFront, options);
+        window.renderMathInElement(DOM.cardBack, options);
+    }
+    adjustCardHeight();
 }
 
 /**

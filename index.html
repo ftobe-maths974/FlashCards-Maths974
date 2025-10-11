@@ -25,8 +25,22 @@
             <div id="welcome-screen">
                 <h2>Bibliothèque de Decks</h2>
                 <p>Choisissez un deck à étudier.</p>
-                <ul id="deck-tree">
-                    </ul>
+            
+                <details class="help-section">
+                    <summary>Comment ça marche ? 🤔</summary>
+                    <div>
+                        <p>Imagine que chaque carte est un monstre de jeu vidéo que tu dois battre !</p>
+                        <ul>
+                            <li>Quand tu rencontres un monstre pour la première fois (une nouvelle carte), il est très fort.</li>
+                            <li>Si tu le bats facilement (<strong>Facile</strong>), il ne reviendra pas avant longtemps.</li>
+                            <li>Si tu as un peu de mal (<strong>Correct</strong>), il reviendra te défier demain ou après-demain.</li>
+                            <li>Si c'était très dur (<strong>Difficile</strong>), il reviendra te voir très bientôt !</li>
+                            <li>Et si tu perds (<strong>À revoir</strong>), tu devras le combattre à nouveau tout de suite !</li>
+                        </ul>
+                        <p>L'application est comme un entraîneur : elle fait revenir les monstres les plus difficiles plus souvent pour que tu deviennes un vrai champion de la mémoire ! 💪</p>
+                    </div>
+                </details>
+            
                 <details class="help-section">
                     <summary>Guide des boutons et de l'interface 🧭</summary>
                     <div>
@@ -34,7 +48,6 @@
                         <ul>
                             <li><strong>🌙 / ☀️</strong> : Permet de basculer entre le thème clair et le thème sombre.</li>
                         </ul>
-                
                         <h4>Pendant une session d'étude</h4>
                         <ul>
                             <li><strong>La carte (Question)</strong> : Cliquez dessus pour la retourner et afficher la réponse.</li>
@@ -42,16 +55,18 @@
                             <li><strong>Difficile (2)</strong> : Si vous avez eu beaucoup de mal à trouver. La carte vous sera aussi représentée un peu plus tard dans la session.</li>
                             <li><strong>Correct (3)</strong> : Si vous avez trouvé la réponse avec un peu d'hésitation. L'intervalle de révision sera modérément augmenté.</li>
                             <li><strong>Facile (4)</strong> : Si la réponse était évidente. L'intervalle de révision sera fortement augmenté.</li>
-                            <li><strong>Réinitialiser ce deck</strong> : Efface toute votre progression (dates de révision, intervalles) pour le deck en cours. Utile si vous voulez recommencer l'apprentissage de zéro.</li>
-                            <li><strong>Quitter & retourner au menu</strong> : Met fin à la session en cours. Votre progression sur les cartes déjà vues est sauvegardée.</li>
+                            <li><strong>Réinitialiser ce deck</strong> : Efface toute votre progression pour le deck en cours.</li>
+                            <li><strong>Quitter & retourner au menu</strong> : Met fin à la session. Votre progression est sauvegardée.</li>
                         </ul>
-                
                          <h4>Quand un deck est terminé</h4>
                         <ul>
-                            <li><strong>Retourner à la bibliothèque</strong> : Vous ramène à l'écran d'accueil pour choisir un autre deck.</li>
+                            <li><strong>Retourner à la bibliothèque</strong> : Vous ramène à l'écran d'accueil.</li>
                         </ul>
                     </div>
                 </details>
+                
+                <ul id="deck-tree">
+                    </ul>
             </div>
             <div id="app-screen" class="hidden">
                 <div id="deck-info">

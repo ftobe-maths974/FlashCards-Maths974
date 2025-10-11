@@ -127,3 +127,39 @@ export function resetDeckProgress(deckPath, deckName) {
         }
     }
 }
+
+// DANS LE FICHIER js/state.js, AJOUTEZ CETTE NOUVELLE FONCTION :
+
+/**
+ * Analyse le manifeste et la progression pour déterminer quels decks ont des cartes à réviser.
+ * @param {Array<Object>} manifest - La structure brute des decks.
+ * @returns {Promise<Array<Object>>} Le manifeste "enrichi" avec un statut de révision.
+ */
+export async function getDecksWithStatus(manifest) {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Crée une fonction récursive pour parcourir l'arborescence
+    async function processItems(items) {
+        for (const item of items) {
+            if (item.type === 'fichier') {
+                const progress = loadDeckProgress(item.path);
+                const hasProgress = Object.keys(progress).length > 0;
+                
+                if (!hasProgress) {
+                    item.hasDueCards = true; // Un deck jamais commencé a des cartes à faire
+                } else {
+                    // Vérifie si au moins une carte est due aujourd'hui
+                    item.hasDueCards = Object.values(progress).some(card => card.prochaine_revision <= today);
+                }
+            } else if (item.type === 'dossier' && item.contenu) {
+                // On continue la recherche dans les sous-dossiers
+                await processItems(item.contenu);
+            }
+        }
+    }
+
+    await processItems(manifest);
+    return manifest;
+}
+
+

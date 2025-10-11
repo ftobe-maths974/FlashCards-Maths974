@@ -5,7 +5,7 @@
 
 // --- Import des modules ---
 import { getDecksWithStatus, appState, initializeDeck, resetApp, resetDeckProgress, saveCurrentDeckProgress } from './state.js';
-import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, showCard } from './ui.js'; 
+import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, transitionToNextCard } from './ui.js';
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
 

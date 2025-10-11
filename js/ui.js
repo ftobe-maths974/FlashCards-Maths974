@@ -17,7 +17,7 @@ export const DOM = {
     deckProgressEl: document.getElementById('deck-progress'),
     noCardsMessage: document.getElementById('no-cards-message'),
     themeToggle: document.getElementById('theme-toggle'),
-    backToLibraryBtn: document.getElementById('btn-back-to-library'),
+    //backToLibraryBtn: document.getElementById('btn-back-to-library'),
     quitSessionBtn: document.getElementById('btn-quit-session'),
     studyModeModal: document.getElementById('study-mode-modal'),
     startSessionBtn: document.getElementById('start-session-btn'),

@@ -66,25 +66,40 @@ function handleCardAnswer(quality) {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
-    // ÉTAPE 1 : On traite la logique de la réponse.
-    processAnswer(card, quality);
-    
-    // ÉTAPE 2 : On gère la file d'attente des cartes difficiles.
-    if (quality <= 2) {
-        const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
-        const insertOffset = Math.floor(Math.random() * 4) + 2;
-        const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
-        appState.dueCards.splice(newIndex, 0, failedCard);
-    } else {
-        appState.currentCardIndex++;
-    }
+    // ÉTAPE 1 : On déclenche la disparition IMMÉDIATEMENT au clic.
+    DOM.answerButtons.classList.add('hidden');
+    const cardInner = DOM.cardContainer.querySelector('.card-inner');
+    cardInner.style.opacity = '0';
 
-    // ÉTAPE 3 : On demande à l'interface de gérer la transition visuelle.
-    if (appState.currentCardIndex < appState.dueCards.length) {
-        transitionToNextCard(); // On appelle la nouvelle fonction de l'UI
-    } else {
-        render(); // La session est finie
-    }
+    // ÉTAPE 2 : On attend la fin de l'animation de disparition (200ms).
+    setTimeout(() => {
+        // --- La carte est maintenant invisible ---
+
+        // ÉTAPE 3 : On exécute toute la logique de l'application (SRS, file d'attente...).
+        processAnswer(card, quality);
+        
+        if (quality <= 2) {
+            const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
+            const insertOffset = Math.floor(Math.random() * 4) + 2;
+            const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
+            appState.dueCards.splice(newIndex, 0, failedCard);
+        } else {
+            appState.currentCardIndex++;
+        }
+
+        // ÉTAPE 4 : On décide de la suite.
+        if (appState.currentCardIndex < appState.dueCards.length) {
+            // S'il y a une carte suivante :
+            // a) On prépare la nouvelle carte (remplissage, etc.) pendant qu'elle est invisible.
+            prepareNextCard(); 
+            // b) On déclenche sa réapparition.
+            cardInner.style.opacity = '1';
+        } else {
+            // S'il n'y a plus de cartes, on affiche l'écran de fin.
+            render();
+        }
+
+    }, 200); // Cette durée DOIT correspondre à la transition d'opacité dans votre CSS.
 }
 
 function setupEventListeners() {

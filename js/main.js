@@ -49,39 +49,39 @@ async function startNewSession() {
  * Gère la réponse de l'utilisateur à une carte.
  * @param {number} quality La qualité de la réponse (1-4).
  */
+// DANS LE FICHIER js/main.js, REMPLACEZ LA FONCTION handleCardAnswer PAR CELLE-CI :
+
 function handleCardAnswer(quality) {
+    // --- ÉTAPE 1 : On cache IMMÉDIATEMENT les boutons de réponse ---
+    DOM.answerButtons.classList.add('hidden');
+
     const card = appState.dueCards[appState.currentCardIndex];
     
-    // 1. On calcule et sauvegarde la nouvelle date de révision (pour les prochains jours)
+    // 2. On calcule et sauvegarde la nouvelle date de révision
     processAnswer(card, quality);
+    // Note: la sauvegarde complète du deck se fait en quittant la session, c'est bien.
 
-    // 2. Si la carte a été jugée difficile, on la remet dans la file d'attente de la session
+    // 3. Si la carte a été jugée difficile, on la remet dans la file d'attente
     if (quality <= 2) { // Qualité 1 (À revoir) ou 2 (Difficile)
-        // On retire la carte de sa position actuelle...
         const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
         
-        // ...et on la réinsère plus loin dans le deck (entre 2 et 5 positions plus loin)
         const remainingCount = appState.dueCards.length - appState.currentCardIndex;
-        const insertOffset = Math.floor(Math.random() * 4) + 2; // Un décalage aléatoire
+        const insertOffset = Math.floor(Math.random() * 4) + 2;
         const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
         
         appState.dueCards.splice(newIndex, 0, failedCard);
         
-        // On ne change pas l'index, car on veut passer à la carte qui a pris la place de celle qu'on a déplacée.
-        
     } else {
-        // Si la réponse était bonne, on passe simplement à la carte suivante
         appState.currentCardIndex++;
     }
 
-    // 3. On décide quoi afficher ensuite
+    // 4. On décide quoi afficher ensuite
     if (appState.currentCardIndex < appState.dueCards.length) {
-        showCard();
+        showCard(); // showCard va gérer le masquage/affichage de la carte elle-même
     } else {
         render(); // La session est finie
     }
 }
-
 /**
  * Met en place tous les écouteurs d'événements de l'application.
  */

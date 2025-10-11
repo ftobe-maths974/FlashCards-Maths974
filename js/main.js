@@ -114,6 +114,18 @@ function setupEventListeners() {
             }
         }
     });
+    // Dans js/main.js, ajoutez ceci à la fonction setupEventListeners
+
+    // ... (à la fin de la fonction setupEventListeners)
+    DOM.resetDeckBtn.addEventListener('click', () => {
+        if (appState.deckPath) {
+            resetDeckProgress(appState.deckPath, appState.deckName);
+            // Si le deck actuel a été réinitialisé, on retourne à l'accueil
+            if (appState.deckName === null) {
+                render();
+            }
+        }
+    });
 }
 
 /**

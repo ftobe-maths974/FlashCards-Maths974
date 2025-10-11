@@ -28,11 +28,15 @@ export const DOM = {
 /**
  * Fonction de rendu principale. Met à jour l'UI en fonction de l'état actuel.
  */
+// DANS LE FICHIER js/ui.js, REMPLACEZ LA FONCTION RENDER EXISTANTE :
+
 export function render() {
     if (!appState.deckName) {
+        // --- Écran d'accueil ---
         DOM.welcomeScreen.classList.remove('hidden');
         DOM.appScreen.classList.add('hidden');
     } else {
+        // --- Écran de session d'étude ---
         DOM.welcomeScreen.classList.add('hidden');
         DOM.appScreen.classList.remove('hidden');
         
@@ -40,17 +44,23 @@ export function render() {
         appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
         
         DOM.deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
-        const dueCount = appState.dueCards.length;
-        DOM.deckProgressEl.textContent = `À réviser: ${dueCount}`;
         
-        if (dueCount > 0) {
+        // On s'assure que les boutons de contrôle sont TOUJOURS visibles sur cet écran.
+        DOM.controls.classList.remove('hidden');
+
+        if (appState.dueCards.length > 0) {
+            // S'il y a des cartes à réviser
             appState.currentCardIndex = 0;
-            showCard();
+            DOM.cardContainer.classList.remove('hidden');
             DOM.noCardsMessage.classList.add('hidden');
+            showCard(); // Affiche la première carte et le compteur
         } else {
+            // S'il n'y a AUCUNE carte à réviser pour aujourd'hui
+            DOM.deckProgressEl.textContent = `À réviser: 0`;
             DOM.cardContainer.classList.add('hidden');
             DOM.answerButtons.classList.add('hidden');
             DOM.noCardsMessage.classList.remove('hidden');
+            // Les boutons de contrôle ("Réinitialiser", "Sauver") restent visibles.
         }
     }
 }

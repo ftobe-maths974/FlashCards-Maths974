@@ -1,65 +1,70 @@
 /**
  * Ce module gère l'état de l'application et les interactions avec le localStorage.
- * Nouvelle architecture : le localStorage ne stocke QUE la progression des cartes,
- * pas le contenu (Question/Réponse).
+ * NOUVELLE ARCHITECTURE ROBUSTE : Chaque deck a son propre objet de progression
+ * dans le localStorage, empêchant toute contamination entre les decks.
  */
 
 // L'état de la session en cours, en mémoire vive.
 export let appState = { 
     deckName: null,
-    deckPath: null, // On garde le chemin du deck pour identifier les cartes
-    cards: [],      // Le deck "hydraté" (contenu + progression) pour la session
+    deckPath: null,
+    cards: [],
     dueCards: [],
     currentCardIndex: -1,
     studyMode: 'recto'
 };
 
-const PROGRESS_STORAGE_KEY = 'flashcard_progress';
+const PROGRESS_STORAGE_KEY_PREFIX = 'flashcard_progress_';
 
 /**
- * Charge TOUTE la progression de l'utilisateur depuis le localStorage.
- * @returns {object} Un objet contenant la progression de toutes les cartes de tous les decks.
+ * Charge la progression pour UN SEUL deck depuis le localStorage.
+ * @param {string} deckPath - L'identifiant unique du deck (son chemin).
+ * @returns {object} Un objet contenant la progression des cartes du deck, ou un objet vide.
  */
-function loadAllProgress() {
-    const savedProgress = localStorage.getItem(PROGRESS_STORAGE_KEY);
+function loadDeckProgress(deckPath) {
+    const key = PROGRESS_STORAGE_KEY_PREFIX + deckPath;
+    const savedProgress = localStorage.getItem(key);
     return savedProgress ? JSON.parse(savedProgress) : {};
 }
 
 /**
- * Sauvegarde la progression d'une seule carte dans le localStorage.
- * C'est plus efficace que de tout sauvegarder à chaque fois.
- * @param {object} card La carte dont il faut sauvegarder la progression.
+ * Sauvegarde la progression pour UN SEUL deck dans le localStorage.
+ * @param {string} deckPath - L'identifiant du deck.
+ * @param {Array<Object>} cards - Le tableau complet des cartes du deck avec leur progression à jour.
  */
-export function saveCardProgress(card) {
-    const allProgress = loadAllProgress();
-    allProgress[card.id_unique] = {
-        prochaine_revision: card.prochaine_revision,
-        intervalle: card.intervalle,
-        facteur_facilite: card.facteur_facilite,
-        statut: card.statut
-    };
-    localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(allProgress));
+function saveDeckProgress(deckPath, cards) {
+    const key = PROGRESS_STORAGE_KEY_PREFIX + deckPath;
+    const progressToSave = {};
+    // On ne sauvegarde que les données de progression, pas le contenu Question/Réponse
+    cards.forEach((card, index) => {
+        progressToSave[index] = {
+            prochaine_revision: card.prochaine_revision,
+            intervalle: card.intervalle,
+            facteur_facilite: card.facteur_facilite,
+            statut: card.statut
+        };
+    });
+    localStorage.setItem(key, JSON.stringify(progressToSave));
 }
 
 /**
  * Initialise un deck en fusionnant le contenu brut avec la progression sauvegardée.
  * C'est l'étape d'"hydratation".
- * @param {Array<Object>} cardsData Le contenu brut des cartes ({ Question, Réponse }).
- * @param {string} deckName Le nom du deck.
- * @param {string} deckPath Le chemin du fichier du deck (sert d'identifiant).
- * @param {string} mode Le mode d'étude choisi.
+ * @param {Array<Object>} cardsData - Le contenu brut des cartes ({ Question, Réponse }).
+ * @param {string} deckName - Le nom du deck.
+ * @param {string} deckPath - Le chemin du fichier du deck.
+ * @param {string} mode - Le mode d'étude choisi.
  */
 export function initializeDeck(cardsData, deckName, deckPath, mode) {
     const now = new Date().toISOString().split('T')[0];
-    const allProgress = loadAllProgress();
+    const deckProgress = loadDeckProgress(deckPath);
 
     appState.deckName = deckName;
     appState.deckPath = deckPath;
     appState.studyMode = mode;
     
     appState.cards = cardsData.map((cardContent, index) => {
-        const cardId = `${deckPath}#${index}`;
-        const progress = allProgress[cardId] || {
+        const progress = deckProgress[index] || { // On cherche la progression par l'index
             prochaine_revision: now,
             intervalle: 0,
             facteur_facilite: 2.5,
@@ -67,50 +72,58 @@ export function initializeDeck(cardsData, deckName, deckPath, mode) {
         };
 
         return {
-            id_unique: cardId,
+            id_unique: `${deckPath}#${index}`, // L'ID reste utile en mémoire vive
             Question: cardContent.Question,
             Réponse: cardContent.Réponse,
             ...progress // On fusionne le contenu et la progression
         };
     });
-    console.log('État des cartes après chargement de la progression :', appState.cards);
+}
+
+/**
+ * Sauvegarde la progression du deck actuellement en cours d'étude.
+ */
+export function saveCurrentDeckProgress() {
+    if (appState.deckPath && appState.cards.length > 0) {
+        saveDeckProgress(appState.deckPath, appState.cards);
+    }
 }
 
 /**
  * Réinitialise l'état de la session en cours (en mémoire vive).
  */
 export function resetApp() {
+    // On sauvegarde la progression du deck qu'on quitte avant de réinitialiser l'état.
+    saveCurrentDeckProgress();
+    
     appState.deckName = null;
     appState.deckPath = null;
     appState.cards = [];
     appState.dueCards = [];
     appState.currentCardIndex = -1;
     appState.studyMode = 'recto';
-    // On ne touche plus au localStorage ici, la progression est conservée.
 }
 
 /**
- * Réinitialise la progression d'un deck spécifique dans le localStorage.
- * @param {string} deckPath Le chemin du deck à réinitialiser.
+ * Réinitialise la progression d'un deck spécifique en supprimant sa boîte du localStorage.
+ * @param {string} deckPath - Le chemin du deck à réinitialiser.
+ * @param {string} deckName - Le nom du deck pour l'affichage du message.
  */
 export function resetDeckProgress(deckPath, deckName) {
-    if (confirm(`Êtes-vous sûr de vouloir réinitialiser la progression pour le deck "${deckName}" ? Cette action est irréversible.`)) {
-        const allProgress = loadAllProgress();
+    if (confirm(`Êtes-vous sûr de vouloir réinitialiser toute la progression pour le deck "${deckName}" ? Cette action est irréversible.`)) {
+        const key = PROGRESS_STORAGE_KEY_PREFIX + deckPath;
+        localStorage.removeItem(key); // On supprime simplement la bonne clé.
+        alert(`Progression réinitialisée pour le deck "${deckName}".`);
         
-        // On supprime toutes les clés qui commencent par le chemin du deck
-        Object.keys(allProgress).forEach(key => {
-            if (key.startsWith(deckPath)) {
-                delete allProgress[key];
-            }
-        });
-
-        localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(allProgress));
-        alert(`Progression réinitialisée pour le deck "${deckPath}".`);
         // Si le deck réinitialisé est celui en cours, on quitte la session
         if (appState.deckPath === deckPath) {
-            resetApp();
-            // Il faudra appeler render() depuis main.js pour rafraîchir l'UI
+            // On réinitialise l'état sans sauvegarder la progression qu'on vient d'effacer
+            appState.deckName = null;
+            appState.deckPath = null;
+            appState.cards = [];
+            appState.dueCards = [];
+            appState.currentCardIndex = -1;
+            appState.studyMode = 'recto';
         }
     }
-
 }

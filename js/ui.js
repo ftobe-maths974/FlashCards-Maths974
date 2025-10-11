@@ -1,6 +1,5 @@
 /**
  * Ce module gère toutes les manipulations du DOM (l'interface utilisateur).
- * Il lit l'état depuis le module `state` pour mettre à jour l'affichage.
  */
 
 import { appState } from './state.js';
@@ -21,82 +20,59 @@ export const DOM = {
     studyModeModal: document.getElementById('study-mode-modal'),
     startSessionBtn: document.getElementById('start-session-btn'),
     deckTreeContainer: document.getElementById('deck-tree'),
-    controls: document.getElementById('controls-container'),
-    resetDeckBtn: document.getElementById('btn-reset-deck')
+    controls: document.getElementById('controls-container')
 };
 
 /**
  * Fonction de rendu principale. Met à jour l'UI en fonction de l'état actuel.
  */
-// DANS LE FICHIER js/ui.js, REMPLACEZ LA FONCTION RENDER EXISTANTE :
-
 export function render() {
     if (!appState.deckName) {
-        // --- Écran d'accueil ---
         DOM.welcomeScreen.classList.remove('hidden');
         DOM.appScreen.classList.add('hidden');
     } else {
-        // --- Écran de session d'étude ---
         DOM.welcomeScreen.classList.add('hidden');
         DOM.appScreen.classList.remove('hidden');
-        
-        const today = new Date().toISOString().split('T')[0];
-        appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
-        
-        DOM.deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
-        
-        // On s'assure que les boutons de contrôle sont TOUJOURS visibles sur cet écran.
         DOM.controls.classList.remove('hidden');
 
+        const today = new Date().toISOString().split('T')[0];
+        appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
+        DOM.deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
+
         if (appState.dueCards.length > 0) {
-            // S'il y a des cartes à réviser
             appState.currentCardIndex = 0;
             DOM.cardContainer.classList.remove('hidden');
             DOM.noCardsMessage.classList.add('hidden');
-            showCard(); // Affiche la première carte et le compteur
+            showCard();
         } else {
-            // S'il n'y a AUCUNE carte à réviser pour aujourd'hui
             DOM.deckProgressEl.textContent = `À réviser: 0`;
             DOM.cardContainer.classList.add('hidden');
             DOM.answerButtons.classList.add('hidden');
             DOM.noCardsMessage.classList.remove('hidden');
-            // Les boutons de contrôle ("Réinitialiser", "Sauver") restent visibles.
         }
     }
 }
 
 /**
- * Affiche le contenu de la carte actuelle et lance le rendu LaTeX.
+ * Affiche le contenu de la carte actuelle de manière séquentielle pour éviter les bugs visuels.
  */
 export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
     const cardInner = DOM.cardContainer.querySelector('.card-inner');
-
-    // ÉTAPE 1 : On fait disparaître le contenu actuel (fondu).
     cardInner.style.opacity = '0';
     
-    // On met à jour le compteur pendant que la carte disparaît.
     const remainingCards = appState.dueCards.length - appState.currentCardIndex;
     DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
     
-    // On attend la fin de l'animation de disparition.
     setTimeout(() => {
-        // --- LA CARTE EST MAINTENANT INVISIBLE ---
-
-        // ÉTAPE 2 : On VIDE complètement le contenu des deux faces.
         DOM.cardFront.innerHTML = '';
         DOM.cardBack.innerHTML = '';
-
-        // ÉTAPE 3 : On coupe les animations et on FLIP la carte (vide) à l'endroit.
         cardInner.style.transition = 'none';
         DOM.cardContainer.classList.remove('is-flipped');
-        
-        // On force le navigateur à prendre en compte ces changements immédiatement.
-        cardInner.offsetHeight; 
+        cardInner.offsetHeight;
 
-        // ÉTAPE 4 : On REMPLIT la carte (toujours invisible) avec le nouveau contenu.
         let questionText = card.Question;
         let answerText = card.Réponse;
         let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
@@ -111,11 +87,21 @@ export function showCard() {
         }
         adjustCardHeight();
 
-        // ÉTAPE 5 : On réactive les animations et on fait réapparaître la carte propre et à l'endroit.
-        cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
-        cardInner.style.opacity = '1';
-        
-    }, 200); // Durée de l'animation d'opacité
+        setTimeout(() => {
+            cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
+            cardInner.style.opacity = '1';
+        }, 0);
+    }, 200);
+}
+
+/**
+ * Gère l'animation de retournement de la carte.
+ */
+export function flipCard() {
+    if (appState.dueCards.length > 0) {
+        DOM.cardContainer.classList.add('is-flipped');
+        DOM.answerButtons.classList.remove('hidden');
+    }
 }
 
 /**
@@ -131,9 +117,6 @@ export function adjustCardHeight() {
 
 /**
  * Construit le menu en arborescence de la bibliothèque de decks.
- * @param {HTMLElement} parentElement L'élément UL parent.
- * @param {Array<Object>} items Les items (dossiers/fichiers) à ajouter.
- * @param {Function} onFileClick Le callback à exécuter lors d'un clic sur un fichier.
  */
 export function buildTreeMenu(parentElement, items, onFileClick) {
     for (const item of items) {
@@ -145,7 +128,7 @@ export function buildTreeMenu(parentElement, items, onFileClick) {
             const indicator = document.createElement('i');
             indicator.className = 'deck-status';
             if (item.hasDueCards) {
-                indicator.textContent = '🔔'; // Ou '🔴'
+                indicator.textContent = '🔔';
                 indicator.title = 'Des cartes sont à réviser !';
             } else {
                 indicator.textContent = '✅';
@@ -164,7 +147,7 @@ export function buildTreeMenu(parentElement, items, onFileClick) {
             if (item.contenu && item.contenu.length > 0) {
                 buildTreeMenu(subUl, item.contenu, onFileClick);
             }
-        } else { // type 'fichier'
+        } else {
             li.className = 'deck-file';
             span.onclick = () => onFileClick(item);
         }

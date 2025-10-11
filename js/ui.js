@@ -65,7 +65,7 @@ export function showCard() {
     // ÉTAPE 1 : On applique la classe qui cache INSTANTANÉMENT la carte.
     DOM.cardContainer.classList.add('is-updating');
 
-    // On utilise setTimeout avec un délai de 0 pour forcer le navigateur 
+    // On utilise setTimeout avec un délai de 0 pour forcer le navigateur
     // à traiter le masquage AVANT d'exécuter le code à l'intérieur.
     setTimeout(() => {
         // --- TOUT CE QUI SUIT SE PASSE PENDANT QUE LA CARTE EST INVISIBLE ---

@@ -60,41 +60,66 @@ export function render() {
  */
 export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
-    DOM.cardContainer.classList.remove('hidden', 'is-flipped');
-    
-    let questionText = card.Question;
-    let answerText = card.Réponse;
-    let showFrontFirst;
+    if (!card) return; // Sécurité si aucune carte n'est disponible
 
-    if (appState.studyMode === 'recto') {
-        showFrontFirst = true;
-    } else if (appState.studyMode === 'verso') {
-        showFrontFirst = false;
-    } else { // aleatoire
-        showFrontFirst = Math.random() < 0.5;
-    }
+    // 1. On cache la carte actuelle avec une transition de fondu
+    DOM.cardContainer.style.opacity = '0';
 
-    // --- CORRECTION FINALE ---
-    // On précise "window.marked" pour accéder à la librairie globale
-    if (showFrontFirst) {
-        DOM.cardFront.innerHTML = window.marked.parse(questionText || '');
-        DOM.cardBack.innerHTML = window.marked.parse(answerText || '');
-    } else {
-        DOM.cardFront.innerHTML = window.marked.parse(answerText || '');
-        DOM.cardBack.innerHTML = window.marked.parse(questionText || '');
-    }
+    // 2. On attend la fin de la transition (300ms) pour manipuler la carte
+    setTimeout(() => {
+        // --- Pendant que la carte est invisible ---
 
-    if (window.renderMathInElement) {
-        const options = { delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '$', right: '$', display: false}
-        ]};
-        window.renderMathInElement(DOM.cardFront, options);
-        window.renderMathInElement(DOM.cardBack, options);
-    }
+        // On désactive temporairement les transitions pour que les changements soient instantanés
+        DOM.cardContainer.style.transition = 'none';
+        
+        // On retourne la carte sur sa face avant (question)
+        DOM.cardContainer.classList.remove('is-flipped');
 
-    DOM.answerButtons.classList.add('hidden');
-    adjustCardHeight();
+        // On met à jour le contenu avec la nouvelle carte
+        let questionText = card.Question;
+        let answerText = card.Réponse;
+        let showFrontFirst;
+
+        if (appState.studyMode === 'recto') {
+            showFrontFirst = true;
+        } else if (appState.studyMode === 'verso') {
+            showFrontFirst = false;
+        } else { // aleatoire
+            showFrontFirst = Math.random() < 0.5;
+        }
+
+        if (showFrontFirst) {
+            DOM.cardFront.innerHTML = window.marked.parse(questionText || '');
+            DOM.cardBack.innerHTML = window.marked.parse(answerText || '');
+        } else {
+            DOM.cardFront.innerHTML = window.marked.parse(answerText || '');
+            DOM.cardBack.innerHTML = window.marked.parse(questionText || '');
+        }
+
+        // On applique le rendu LaTeX
+        if (window.renderMathInElement) {
+            const options = { delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]};
+            window.renderMathInElement(DOM.cardFront, options);
+            window.renderMathInElement(DOM.cardBack, options);
+        }
+
+        DOM.answerButtons.classList.add('hidden');
+        adjustCardHeight();
+
+        // On utilise requestAnimationFrame pour s'assurer que le navigateur a bien traité
+        // les changements précédents avant de réactiver les transitions et de réafficher la carte.
+        requestAnimationFrame(() => {
+            // On réactive les transitions (y compris celle pour l'opacité)
+            DOM.cardContainer.style.transition = 'height 0.3s ease-in-out, opacity 0.3s ease, transform 0.6s';
+            // 3. On fait réapparaître la carte avec la nouvelle question
+            DOM.cardContainer.classList.remove('hidden');
+            DOM.cardContainer.style.opacity = '1';
+        });
+
+    }, 300); // Cette durée doit correspondre à la transition CSS de l'opacité
 }
 
 /**

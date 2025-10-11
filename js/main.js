@@ -86,11 +86,11 @@ function setupEventListeners() {
     DOM.themeToggle.addEventListener('click', toggleTheme);
 
     // Navigation et session
+    // DANS LE FICHIER js/main.js
+
     DOM.quitSessionBtn.addEventListener('click', () => {
-        if (confirm("Êtes-vous sûr de vouloir quitter ? Votre progression sera sauvegardée.")) {
-            resetApp(); // resetApp sauvegarde la progression
-            render();
-        }
+        resetApp();
+        render();
     });
 
     // Modale de choix de mode

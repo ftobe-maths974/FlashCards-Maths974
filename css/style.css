@@ -317,4 +317,15 @@ h1 {
     display: none !important; 
 }
 
+/* AJOUTEZ CECI À LA FIN DE VOTRE FICHIER css/style.css */
+
+.deck-file {
+    display: flex;
+    align-items: center;
+}
+
+.deck-status {
+    font-style: normal;
+    margin-right: 8px;
+}
 

@@ -51,19 +51,20 @@ async function startNewSession() {
  */
 // DANS LE FICHIER js/main.js
 
+// DANS LE FICHIER js/main.js
+
 function handleCardAnswer(quality) {
+    // On déclare 'card' UNE SEULE FOIS, ici.
     const card = appState.dueCards[appState.currentCardIndex];
-    if (!card) return; // S'il n'y a pas de carte, on ne fait rien.
-    
-    // --- ÉTAPE 1 : On cache IMMÉDIATEMENT tous les boutons ---
+    if (!card) return; // La sécurité est maintenant gérée par cette unique déclaration.
+
+    // On cache IMMÉDIATEMENT les boutons de réponse
     DOM.answerButtons.classList.add('hidden');
     
-    const card = appState.dueCards[appState.currentCardIndex];
-    
-    // 2. On traite la réponse
+    // On traite la réponse (on utilise la variable 'card' déjà déclarée)
     processAnswer(card, quality);
-
-    // 3. On gère la file d'attente des cartes difficiles
+    
+    // On gère la file d'attente des cartes difficiles
     if (quality <= 2) {
         const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
         const remainingCount = appState.dueCards.length - appState.currentCardIndex;
@@ -74,7 +75,7 @@ function handleCardAnswer(quality) {
         appState.currentCardIndex++;
     }
 
-    // 4. On affiche la suite
+    // On affiche la suite
     if (appState.currentCardIndex < appState.dueCards.length) {
         showCard();
     } else {

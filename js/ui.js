@@ -60,22 +60,19 @@ export function render() {
  */
 export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
-    if (!card) return; // Sécurité si aucune carte n'est disponible
+    if (!card) return;
 
-    // 1. On cache la carte actuelle avec une transition de fondu
-    DOM.cardContainer.style.opacity = '0';
+    // ÉTAPE 1 : On applique la classe qui cache INSTANTANÉMENT la carte.
+    DOM.cardContainer.classList.add('is-updating');
 
-    // 2. On attend la fin de la transition (300ms) pour manipuler la carte
+    // On utilise setTimeout avec un délai de 0 pour forcer le navigateur 
+    // à traiter le masquage AVANT d'exécuter le code à l'intérieur.
     setTimeout(() => {
-        // --- Pendant que la carte est invisible ---
+        // --- TOUT CE QUI SUIT SE PASSE PENDANT QUE LA CARTE EST INVISIBLE ---
 
-        // On désactive temporairement les transitions pour que les changements soient instantanés
-        DOM.cardContainer.style.transition = 'none';
-        
-        // On retourne la carte sur sa face avant (question)
-        DOM.cardContainer.classList.remove('is-flipped');
+        // ÉTAPE 2 : On met à jour l'état et le contenu de la carte.
+        DOM.cardContainer.classList.remove('is-flipped'); // On la retourne côté question.
 
-        // On met à jour le contenu avec la nouvelle carte
         let questionText = card.Question;
         let answerText = card.Réponse;
         let showFrontFirst;
@@ -88,13 +85,8 @@ export function showCard() {
             showFrontFirst = Math.random() < 0.5;
         }
 
-        if (showFrontFirst) {
-            DOM.cardFront.innerHTML = window.marked.parse(questionText || '');
-            DOM.cardBack.innerHTML = window.marked.parse(answerText || '');
-        } else {
-            DOM.cardFront.innerHTML = window.marked.parse(answerText || '');
-            DOM.cardBack.innerHTML = window.marked.parse(questionText || '');
-        }
+        DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
+        DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
 
         // On applique le rendu LaTeX
         if (window.renderMathInElement) {
@@ -108,18 +100,12 @@ export function showCard() {
 
         DOM.answerButtons.classList.add('hidden');
         adjustCardHeight();
+        
+        // ÉTAPE 3 : On retire la classe de masquage. La carte réapparaît
+        // instantanément avec son nouveau contenu, déjà sur la bonne face.
+        DOM.cardContainer.classList.remove('is-updating');
 
-        // On utilise requestAnimationFrame pour s'assurer que le navigateur a bien traité
-        // les changements précédents avant de réactiver les transitions et de réafficher la carte.
-        requestAnimationFrame(() => {
-            // On réactive les transitions (y compris celle pour l'opacité)
-            DOM.cardContainer.style.transition = 'height 0.3s ease-in-out, opacity 0.3s ease, transform 0.6s';
-            // 3. On fait réapparaître la carte avec la nouvelle question
-            DOM.cardContainer.classList.remove('hidden');
-            DOM.cardContainer.style.opacity = '1';
-        });
-
-    }, 300); // Cette durée doit correspondre à la transition CSS de l'opacité
+    }, 0); 
 }
 
 /**

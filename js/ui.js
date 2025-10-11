@@ -21,7 +21,8 @@ export const DOM = {
     quitSessionBtn: document.getElementById('btn-quit-session'),
     studyModeModal: document.getElementById('study-mode-modal'),
     startSessionBtn: document.getElementById('start-session-btn'),
-    deckTreeContainer: document.getElementById('deck-tree')
+    deckTreeContainer: document.getElementById('deck-tree'),
+    resetDeckBtn: document.getElementById('btn-reset-deck')
 };
 
 /**

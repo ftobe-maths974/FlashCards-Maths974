@@ -4,7 +4,7 @@
  */
 
 // --- Import des modules ---
-import { appState, initializeDeck, resetApp, saveCardProgress, resetDeckProgress } from './state.js';
+import { appState, initializeDeck, resetApp, resetDeckProgress, saveCurrentDeckProgress } from './state.js';
 import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, showCard } from './ui.js'; 
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
@@ -54,7 +54,6 @@ function handleCardAnswer(quality) {
     
     // 1. On calcule et sauvegarde la nouvelle date de révision (pour les prochains jours)
     processAnswer(card, quality);
-    saveCardProgress(card);
 
     // 2. Si la carte a été jugée difficile, on la remet dans la file d'attente de la session
     if (quality <= 2) { // Qualité 1 (À revoir) ou 2 (Difficile)
@@ -92,12 +91,12 @@ function setupEventListeners() {
 
     // Navigation et session
     DOM.backToLibraryBtn.addEventListener('click', () => {
-        resetApp(); // Réinitialise l'état en mémoire
-        render();   // Met à jour l'affichage
+        resetApp(); // resetApp sauvegarde maintenant automatiquement la progression
+        render();   
     });
     DOM.quitSessionBtn.addEventListener('click', () => {
-        if (confirm("Êtes-vous sûr de vouloir quitter ? La progression sur les cartes déjà vues est sauvegardée.")) {
-            resetApp();
+        if (confirm("Êtes-vous sûr de vouloir quitter ? Votre progression sera sauvegardée.")) {
+            resetApp(); // resetApp sauvegarde la progression
             render();
         }
     });

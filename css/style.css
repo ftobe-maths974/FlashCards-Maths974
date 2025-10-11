@@ -123,7 +123,7 @@ h1 {
     min-height: 200px;
     margin-bottom: 16px;
     cursor: pointer;
-    transition: height 0.3s ease-in-out;
+    transition: height 0.3s ease-in-out, opacity 0.3s ease;
 }
 
 .card-inner {

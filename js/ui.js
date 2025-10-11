@@ -58,59 +58,49 @@ export function render() {
 /**
  * Affiche le contenu de la carte actuelle et lance le rendu LaTeX.
  */
+// DANS LE FICHIER js/ui.js
+
 export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
+    const cardInner = DOM.cardContainer.querySelector('.card-inner');
+
+    // --- ÉTAPE 1 : On préserve la hauteur actuelle et on cache le contenu ---
+    const currentHeight = DOM.cardContainer.offsetHeight;
+    DOM.cardContainer.style.minHeight = `${currentHeight}px`; // Empêche le conteneur de s'effondrer
+    cardInner.style.opacity = '0'; // On ne cache que le contenu, pas le conteneur
+
+    // --- On met à jour le compteur ---
     const remainingCards = appState.dueCards.length - appState.currentCardIndex;
     DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
-
-    // ÉTAPE 1 : On applique la classe qui cache INSTANTANÉMENT la carte.
-    DOM.cardContainer.classList.add('is-updating');
-
-    // On utilise setTimeout avec un délai de 0 pour forcer le navigateur
-    // à traiter le masquage AVANT d'exécuter le code à l'intérieur.
+    
+    // On attend la fin de la transition de fondu (on peut utiliser un délai très court)
     setTimeout(() => {
-        // --- TOUT CE QUI SUIT SE PASSE PENDANT QUE LA CARTE EST INVISIBLE ---
-
-        // ÉTAPE 2 : On met à jour l'état et le contenu de la carte.
-        DOM.cardContainer.classList.remove('is-flipped'); // On la retourne côté question.
+        // --- ÉTAPE 2 : On met à jour le contenu pendant qu'il est invisible ---
+        DOM.cardContainer.classList.remove('is-flipped');
 
         let questionText = card.Question;
         let answerText = card.Réponse;
-        let showFrontFirst;
-
-        if (appState.studyMode === 'recto') {
-            showFrontFirst = true;
-        } else if (appState.studyMode === 'verso') {
-            showFrontFirst = false;
-        } else { // aleatoire
-            showFrontFirst = Math.random() < 0.5;
-        }
+        let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
 
         DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
         DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
 
-        // On applique le rendu LaTeX
         if (window.renderMathInElement) {
-            const options = { delimiters: [
-                {left: '$$', right: '$$', display: true},
-                {left: '$', right: '$', display: false}
-            ]};
+            const options = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
             window.renderMathInElement(DOM.cardFront, options);
             window.renderMathInElement(DOM.cardBack, options);
         }
 
-        DOM.answerButtons.classList.add('hidden');
+        // On ajuste la hauteur du conteneur pour la nouvelle carte (toujours invisible)
         adjustCardHeight();
+
+        // --- ÉTAPE 3 : On réaffiche le nouveau contenu ---
+        cardInner.style.opacity = '1';
         
-        // ÉTAPE 3 : On retire la classe de masquage. La carte réapparaît
-        // instantanément avec son nouveau contenu, déjà sur la bonne face.
-        DOM.cardContainer.classList.remove('is-updating');
-
-    }, 0); 
+    }, 200); // Un court délai pour l'animation de fondu
 }
-
 /**
  * Gère l'animation de retournement de la carte.
  */

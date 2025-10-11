@@ -70,8 +70,6 @@ export function render() {
  */
 // DANS LE FICHIER js/ui.js
 
-// DANS LE FICHIER js/ui.js
-
 export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
@@ -79,37 +77,46 @@ export function showCard() {
     const cardInner = DOM.cardContainer.querySelector('.card-inner');
     const currentHeight = DOM.cardContainer.offsetHeight;
 
+    // ÉTAPE 1 : On préserve la hauteur et on lance le fondu de disparition.
     DOM.cardContainer.style.minHeight = `${currentHeight}px`;
     cardInner.style.opacity = '0';
     
+    // On met à jour le compteur immédiatement.
     const remainingCards = appState.dueCards.length - appState.currentCardIndex;
     DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
     
+    // On attend la fin de l'animation de fondu.
     setTimeout(() => {
-        // ÉTAPE 1 : On retourne la carte (toujours invisible)
+        // --- LA CARTE EST MAINTENANT INVISIBLE ---
+
+        // ÉTAPE 2 : On retourne la carte sur sa face "question" SANS animation.
+        // C'est la clé : on s'assure qu'elle est déjà à l'endroit.
+        cardInner.style.transition = 'none'; // On coupe les animations
         DOM.cardContainer.classList.remove('is-flipped');
         
-        // On attend que le navigateur ait bien traité le "flip" avant de changer le contenu
-        requestAnimationFrame(() => {
-            // ÉTAPE 2 : On met à jour le contenu
-            let questionText = card.Question;
-            let answerText = card.Réponse;
-            let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
+        // On force le navigateur à appliquer ce changement immédiatement.
+        cardInner.offsetHeight; // "Magic trick" pour forcer le reflow du DOM
 
-            DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
-            DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
+        // ÉTAPE 3 : MAINTENANT qu'elle est à l'endroit, on met à jour son contenu.
+        let questionText = card.Question;
+        let answerText = card.Réponse;
+        let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
 
-            if (window.renderMathInElement) {
-                const options = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
-                window.renderMathInElement(DOM.cardFront, options);
-                window.renderMathInElement(DOM.cardBack, options);
-            }
-            adjustCardHeight();
+        DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
+        DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
 
-            // ÉTAPE 3 : On réaffiche le contenu
-            cardInner.style.opacity = '1';
-        });
-    }, 200);
+        if (window.renderMathInElement) {
+            const options = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
+            window.renderMathInElement(DOM.cardFront, options);
+            window.renderMathInElement(DOM.cardBack, options);
+        }
+        adjustCardHeight();
+
+        // ÉTAPE 4 : On réactive les animations et on fait réapparaître la carte.
+        cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
+        cardInner.style.opacity = '1';
+        
+    }, 200); // Doit correspondre à la durée de la transition d'opacité
 }
 /**
  * Gère l'animation de retournement de la carte.

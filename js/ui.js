@@ -143,6 +143,20 @@ export function buildTreeMenu(parentElement, items, onFileClick) {
         const li = document.createElement('li');
         const span = document.createElement('span');
         span.textContent = item.nom;
+
+        if (item.type === 'fichier') {
+            const indicator = document.createElement('i');
+            indicator.className = 'deck-status';
+            if (item.hasDueCards) {
+                indicator.textContent = '🔔'; // Ou '🔴'
+                indicator.title = 'Des cartes sont à réviser !';
+            } else {
+                indicator.textContent = '✅';
+                indicator.title = 'Vous êtes à jour !';
+            }
+            li.appendChild(indicator);
+        }
+        
         li.appendChild(span);
 
         if (item.type === 'dossier') {

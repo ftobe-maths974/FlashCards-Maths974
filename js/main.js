@@ -4,7 +4,7 @@
  */
 
 // --- Import des modules ---
-import { appState, initializeDeck, resetApp, resetDeckProgress, saveCurrentDeckProgress } from './state.js';
+import { getDecksWithStatus, appState, initializeDeck, resetApp, resetDeckProgress, saveCurrentDeckProgress } from './state.js';
 import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, showCard } from './ui.js'; 
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
@@ -144,11 +144,13 @@ async function init() {
     setupEventListeners();
     applySavedTheme();
     
-    const manifest = await fetchDeckLibrary();
-    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
+    let manifest = await fetchDeckLibrary();
+    // On enrichit le manifeste avec le statut de révision de chaque deck
+    manifest = await getDecksWithStatus(manifest);
     
-    // On ne charge plus d'état au démarrage, l'application commence toujours sur l'accueil.
+    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
 }
+
 
 // --- Lancement de l'application ---
 init();

@@ -70,34 +70,33 @@ export function render() {
  */
 // DANS LE FICHIER js/ui.js
 
+// DANS LE FICHIER js/ui.js, REMPLACEZ LA FONCTION showCard :
+
 export function showCard() {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
     const cardInner = DOM.cardContainer.querySelector('.card-inner');
-    const currentHeight = DOM.cardContainer.offsetHeight;
 
-    // ÉTAPE 1 : On préserve la hauteur et on lance le fondu de disparition.
-    DOM.cardContainer.style.minHeight = `${currentHeight}px`;
+    // ÉTAPE 1 : On lance le fondu de disparition du contenu actuel.
     cardInner.style.opacity = '0';
     
     // On met à jour le compteur immédiatement.
     const remainingCards = appState.dueCards.length - appState.currentCardIndex;
     DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
     
-    // On attend la fin de l'animation de fondu.
+    // On attend la fin de cette animation de fondu.
     setTimeout(() => {
-        // --- LA CARTE EST MAINTENANT INVISIBLE ---
+        // --- LA CARTE EST MAINTENANT COMPLÈTEMENT INVISIBLE ---
 
-        // ÉTAPE 2 : On retourne la carte sur sa face "question" SANS animation.
-        // C'est la clé : on s'assure qu'elle est déjà à l'endroit.
-        cardInner.style.transition = 'none'; // On coupe les animations
+        // ÉTAPE 2 : On coupe TOUTES les animations temporairement.
+        cardInner.style.transition = 'none';
+
+        // ÉTAPE 3 : On retourne la carte sur sa face "question" PENDANT qu'elle est invisible ET sans animation.
         DOM.cardContainer.classList.remove('is-flipped');
-        
-        // On force le navigateur à appliquer ce changement immédiatement.
-        cardInner.offsetHeight; // "Magic trick" pour forcer le reflow du DOM
 
-        // ÉTAPE 3 : MAINTENANT qu'elle est à l'endroit, on met à jour son contenu.
+        // ÉTAPE 4 : On met à jour le contenu avec la nouvelle carte.
+        // Comme il n'y a pas d'animation, le changement est instantané et invisible pour l'utilisateur.
         let questionText = card.Question;
         let answerText = card.Réponse;
         let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
@@ -112,11 +111,16 @@ export function showCard() {
         }
         adjustCardHeight();
 
-        // ÉTAPE 4 : On réactive les animations et on fait réapparaître la carte.
-        cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
-        cardInner.style.opacity = '1';
-        
-    }, 200); // Doit correspondre à la durée de la transition d'opacité
+        // ÉTAPE 5 : On utilise un minuscule délai (setTimeout 0) pour forcer le navigateur à traiter
+        // tous les changements ci-dessus AVANT de réactiver les animations.
+        setTimeout(() => {
+            // On réactive les animations pour le "flip" et le fondu.
+            cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
+            // Et on lance le fondu d'apparition de la nouvelle carte, qui est maintenant propre et à l'endroit.
+            cardInner.style.opacity = '1';
+        }, 0);
+
+    }, 200); // Cette durée doit correspondre à la transition d'opacité dans votre CSS.
 }
 /**
  * Gère l'animation de retournement de la carte.

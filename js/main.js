@@ -9,6 +9,19 @@ import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedThe
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
 
+/**
+ * Charge la bibliothèque, calcule le statut des decks et affiche le menu.
+ * Cette fonction sera maintenant appelée au démarrage ET en quittant une session.
+ */
+async function buildAndShowLibrary() {
+    let manifest = await fetchDeckLibrary();
+    manifest = await getDecksWithStatus(manifest);
+    // On vide l'ancien menu avant de reconstruire
+    DOM.deckTreeContainer.innerHTML = ''; 
+    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
+}
+
+
 // --- Gestionnaires d'événements ---
 
 let deckToLoad = null; // Stockage temporaire des infos du deck à charger
@@ -92,9 +105,10 @@ function setupEventListeners() {
     // Navigation et session
     // DANS LE FICHIER js/main.js
 
-    DOM.quitSessionBtn.addEventListener('click', () => {
-        resetApp();
-        render();
+     DOM.quitSessionBtn.addEventListener('click', () => {
+        resetApp(); // Sauvegarde la session et réinitialise l'état
+        render();   // Affiche l'écran d'accueil
+        buildAndShowLibrary(); // Reconstruit le menu avec les statuts à jour
     });
 
     // Modale de choix de mode
@@ -147,14 +161,8 @@ function setupEventListeners() {
 async function init() {
     setupEventListeners();
     applySavedTheme();
-    
-    let manifest = await fetchDeckLibrary();
-    // On enrichit le manifeste avec le statut de révision de chaque deck
-    manifest = await getDecksWithStatus(manifest);
-    
-    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
+    await buildAndShowLibrary(); // Appel initial
 }
-
 
 // --- Lancement de l'application ---
 init();

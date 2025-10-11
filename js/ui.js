@@ -99,14 +99,26 @@ export function transitionToNextCard() {
  * Remplit la carte avec le contenu de la question/réponse actuelle.
  * Ne gère plus d'animations, seulement le remplissage.
  */
-export function showCard() {
+// DANS LE FICHIER js/ui.js, remplacez la fonction showCard existante par celle-ci
+
+/**
+ * Prépare la carte suivante (remplit le contenu, ajuste la hauteur) PENDANT qu'elle est invisible.
+ * Ne gère aucune animation de visibilité.
+ */
+export function prepareNextCard() {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
+    const cardInner = DOM.cardContainer.querySelector('.card-inner');
+    
     // Met à jour le compteur.
     const remainingCards = appState.dueCards.length - appState.currentCardIndex;
     DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
 
+    // Prépare la carte sans animation.
+    cardInner.style.transition = 'none';
+    DOM.cardContainer.classList.remove('is-flipped');
+    
     // Remplit le contenu.
     let questionText = card.Question;
     let answerText = card.Réponse;
@@ -121,6 +133,12 @@ export function showCard() {
         window.renderMathInElement(DOM.cardBack, options);
     }
     adjustCardHeight();
+
+    // On force le navigateur à appliquer les changements.
+    cardInner.offsetHeight; 
+    
+    // On réactive les transitions pour les futures interactions (flip, et le fondu entrant).
+    cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
 }
 
 /**

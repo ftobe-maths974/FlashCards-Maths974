@@ -20,7 +20,8 @@ export const DOM = {
     studyModeModal: document.getElementById('study-mode-modal'),
     startSessionBtn: document.getElementById('start-session-btn'),
     deckTreeContainer: document.getElementById('deck-tree'),
-    controls: document.getElementById('controls-container')
+    controls: document.getElementById('controls-container'),
+    resetDeckBtn: document.getElementById('btn-reset-deck')
 };
 
 /**

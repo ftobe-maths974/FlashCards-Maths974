@@ -62,25 +62,16 @@ async function startNewSession() {
  * Gère la réponse de l'utilisateur à une carte.
  * @param {number} quality La qualité de la réponse (1-4).
  */
-// DANS LE FICHIER js/main.js
-
-// DANS LE FICHIER js/main.js
-
 function handleCardAnswer(quality) {
-    // On déclare 'card' UNE SEULE FOIS, ici.
     const card = appState.dueCards[appState.currentCardIndex];
-    if (!card) return; // La sécurité est maintenant gérée par cette unique déclaration.
+    if (!card) return;
 
-    // On cache IMMÉDIATEMENT les boutons de réponse
-    DOM.answerButtons.classList.add('hidden');
-    
-    // On traite la réponse (on utilise la variable 'card' déjà déclarée)
+    // ÉTAPE 1 : On traite la logique de la réponse.
     processAnswer(card, quality);
     
-    // On gère la file d'attente des cartes difficiles
+    // ÉTAPE 2 : On gère la file d'attente des cartes difficiles.
     if (quality <= 2) {
         const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
-        const remainingCount = appState.dueCards.length - appState.currentCardIndex;
         const insertOffset = Math.floor(Math.random() * 4) + 2;
         const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
         appState.dueCards.splice(newIndex, 0, failedCard);
@@ -88,14 +79,13 @@ function handleCardAnswer(quality) {
         appState.currentCardIndex++;
     }
 
-    // On affiche la suite
+    // ÉTAPE 3 : On demande à l'interface de gérer la transition visuelle.
     if (appState.currentCardIndex < appState.dueCards.length) {
-        showCard();
+        transitionToNextCard(); // On appelle la nouvelle fonction de l'UI
     } else {
-        render();
+        render(); // La session est finie
     }
 }
-// DANS LE FICHIER js/main.js
 
 function setupEventListeners() {
     // Thème

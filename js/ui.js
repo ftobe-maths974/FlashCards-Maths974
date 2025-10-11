@@ -27,25 +27,40 @@ export const DOM = {
 /**
  * Fonction de rendu principale. Met à jour l'UI en fonction de l'état actuel.
  */
+// DANS LE FICHIER js/ui.js, REMPLACEZ LA FONCTION RENDER EXISTANTE :
+
 export function render() {
     if (!appState.deckName) {
+        // --- Écran d'accueil ---
         DOM.welcomeScreen.classList.remove('hidden');
         DOM.appScreen.classList.add('hidden');
     } else {
+        // --- Écran de session d'étude ---
         DOM.welcomeScreen.classList.add('hidden');
         DOM.appScreen.classList.remove('hidden');
-        DOM.controls.classList.remove('hidden');
-
+        
         const today = new Date().toISOString().split('T')[0];
         appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
+        
         DOM.deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
+        DOM.controls.classList.remove('hidden');
 
         if (appState.dueCards.length > 0) {
+            // S'il y a des cartes à réviser
             appState.currentCardIndex = 0;
             DOM.cardContainer.classList.remove('hidden');
             DOM.noCardsMessage.classList.add('hidden');
-            showCard();
+            
+            // --- CORRECTION APPLIQUÉE ICI ---
+            // On prépare la première carte...
+            prepareNextCard(); 
+            // ...et on s'assure qu'elle est bien visible.
+            const cardInner = DOM.cardContainer.querySelector('.card-inner');
+            cardInner.style.opacity = '1';
+            // --- FIN DE LA CORRECTION ---
+
         } else {
+            // S'il n'y a AUCUNE carte à réviser pour aujourd'hui
             DOM.deckProgressEl.textContent = `À réviser: 0`;
             DOM.cardContainer.classList.add('hidden');
             DOM.answerButtons.classList.add('hidden');

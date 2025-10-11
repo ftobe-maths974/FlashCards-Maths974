@@ -51,17 +51,35 @@ async function startNewSession() {
  */
 function handleCardAnswer(quality) {
     const card = appState.dueCards[appState.currentCardIndex];
+    
+    // 1. On calcule et sauvegarde la nouvelle date de révision (pour les prochains jours)
     processAnswer(card, quality);
     saveCardProgress(card);
 
-    // On passe à la carte suivante
-    appState.currentCardIndex++;
+    // 2. Si la carte a été jugée difficile, on la remet dans la file d'attente de la session
+    if (quality <= 2) { // Qualité 1 (À revoir) ou 2 (Difficile)
+        // On retire la carte de sa position actuelle...
+        const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
+        
+        // ...et on la réinsère plus loin dans le deck (entre 2 et 5 positions plus loin)
+        const remainingCount = appState.dueCards.length - appState.currentCardIndex;
+        const insertOffset = Math.floor(Math.random() * 4) + 2; // Un décalage aléatoire
+        const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
+        
+        appState.dueCards.splice(newIndex, 0, failedCard);
+        
+        // On ne change pas l'index, car on veut passer à la carte qui a pris la place de celle qu'on a déplacée.
+        
+    } else {
+        // Si la réponse était bonne, on passe simplement à la carte suivante
+        appState.currentCardIndex++;
+    }
 
-    // S'il reste des cartes, on affiche la suivante. Sinon, on rafraîchit pour afficher le message de fin.
+    // 3. On décide quoi afficher ensuite
     if (appState.currentCardIndex < appState.dueCards.length) {
         showCard();
     } else {
-        render();
+        render(); // La session est finie
     }
 }
 

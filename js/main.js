@@ -49,37 +49,33 @@ async function startNewSession() {
  * Gère la réponse de l'utilisateur à une carte.
  * @param {number} quality La qualité de la réponse (1-4).
  */
-// DANS LE FICHIER js/main.js, REMPLACEZ LA FONCTION handleCardAnswer PAR CELLE-CI :
+// DANS LE FICHIER js/main.js
 
 function handleCardAnswer(quality) {
-    // --- ÉTAPE 1 : On cache IMMÉDIATEMENT les boutons de réponse ---
+    // --- ÉTAPE 1 : On cache IMMÉDIATEMENT tous les boutons ---
     DOM.answerButtons.classList.add('hidden');
-
+    
     const card = appState.dueCards[appState.currentCardIndex];
     
-    // 2. On calcule et sauvegarde la nouvelle date de révision
+    // 2. On traite la réponse
     processAnswer(card, quality);
-    // Note: la sauvegarde complète du deck se fait en quittant la session, c'est bien.
 
-    // 3. Si la carte a été jugée difficile, on la remet dans la file d'attente
-    if (quality <= 2) { // Qualité 1 (À revoir) ou 2 (Difficile)
+    // 3. On gère la file d'attente des cartes difficiles
+    if (quality <= 2) {
         const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
-        
         const remainingCount = appState.dueCards.length - appState.currentCardIndex;
         const insertOffset = Math.floor(Math.random() * 4) + 2;
         const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
-        
         appState.dueCards.splice(newIndex, 0, failedCard);
-        
     } else {
         appState.currentCardIndex++;
     }
 
-    // 4. On décide quoi afficher ensuite
+    // 4. On affiche la suite
     if (appState.currentCardIndex < appState.dueCards.length) {
-        showCard(); // showCard va gérer le masquage/affichage de la carte elle-même
+        showCard();
     } else {
-        render(); // La session est finie
+        render();
     }
 }
 /**

@@ -60,6 +60,11 @@
                 "nom": "Mélange de tables",
                 "type": "fichier",
                 "path": "cycle2/nombres/tables-multiplication/melange_tables.md"
+              },
+              {
+                "nom": "Les doubles de 1 à 20",
+                "type": "fichier",
+                "path": "cycle2/nombres/tables-multiplication/doubles_1_a_20.md"
               }
             ]
           },

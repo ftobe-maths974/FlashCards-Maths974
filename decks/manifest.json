@@ -70,6 +70,11 @@
                 "nom": "Les doubles de 20 à 100",
                 "type": "fichier",
                 "path": "cycle2/nombres/tables-multiplication/doubles_20_a_100.md"
+              },
+              {
+                "nom": "Les doubles de 100 à 1000",
+                "type": "fichier",
+                "path": "cycle2/nombres/tables-multiplication/doubles_100_a_1000.md"
               }
             ]
           },

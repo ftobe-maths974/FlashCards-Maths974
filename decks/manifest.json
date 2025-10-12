@@ -8,85 +8,154 @@
         "type": "dossier",
         "contenu": [
           {
-            "nom": "Multiplication",
+            "nom": "Addition",
             "type": "dossier",
             "contenu": [
               {
-                "nom": "Table de 2",
+                "nom": "Addition rapide (+8, +9, etc.)",
                 "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_2.md"
-              },
-              {
-                "nom": "Table de 3",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_3.md"
-              },
-              {
-                "nom": "Table de 4",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_4.md"
-              },
-              {
-                "nom": "Table de 5",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_5.md"
-              },
-              {
-                "nom": "Table de 6",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_6.md"
-              },
-              {
-                "nom": "Table de 7",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_7.md"
-              },
-              {
-                "nom": "Table de 8",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_8.md"
-              },
-              {
-                "nom": "Table de 9",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_9.md"
-              },
-              {
-                "nom": "Table de 10",
-                "type": "fichier",
-                "path": "cycle2/nombres/multiplication/table_de_10.md"
+                "path": "cycle2/nombres/addition/addition_rapide_8_et_9.md"
               }
             ]
           },
           {
-            "nom": "Les doubles de 1 à 20",
-            "type": "fichier",
-            "path": "cycle2/nombres/doubles_1_a_20.md"
+            "nom": "Soustraction",
+            "type": "dossier",
+            "contenu": [
+              {
+                "nom": "Soustraction rapide (-9, -19, etc.)",
+                "type": "fichier",
+                "path": "cycle2/nombres/soustraction/soustraction_rapide_9.md"
+              }
+            ]
           },
           {
-            "nom": "Les doubles (nombres ronds)",
-            "type": "fichier",
-            "path": "cycle2/nombres/doubles_specifiques.md"
+            "nom": "Multiplication",
+            "type": "dossier",
+            "contenu": [
+              {
+                "nom": "Tables",
+                "type": "dossier",
+                "contenu": [
+                  {
+                    "nom": "Table de 2",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_2.md"
+                  },
+                  {
+                    "nom": "Table de 3",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_3.md"
+                  },
+                  {
+                    "nom": "Table de 4",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_4.md"
+                  },
+                  {
+                    "nom": "Table de 5",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_5.md"
+                  },
+                  {
+                    "nom": "Table de 6",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_6.md"
+                  },
+                  {
+                    "nom": "Table de 7",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_7.md"
+                  },
+                  {
+                    "nom": "Table de 8",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_8.md"
+                  },
+                  {
+                    "nom": "Table de 9",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_9.md"
+                  },
+                  {
+                    "nom": "Table de 10",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/table_de_10.md"
+                  },
+                  {
+                    "nom": "Mélange Tables Simples",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/multiplication/tables/melange_tables_simple.md"
+                  }
+                ]
+              },
+              {
+                "nom": "Les multiples de 25",
+                "type": "fichier",
+                "path": "cycle2/nombres/multiplication/multiples_de_25.md"
+              },
+              {
+                "nom": "Décompositions de 60",
+                "type": "fichier",
+                "path": "cycle2/nombres/multiplication/decompositions_de_60.md"
+              },
+              {
+                "nom": "Égalités à trous (mêlé x15)",
+                "type": "fichier",
+                "path": "cycle2/nombres/multiplication/egalites_a_trous_mele_15.md"
+              },
+              {
+                "nom": "Multiplier par 10 et 100",
+                "type": "fichier",
+                "path": "cycle2/nombres/multiplication/multiplier_par_10_et_100.md"
+              },
+              {
+                "nom": "Multiplier par 4 et par 8",
+                "type": "fichier",
+                "path": "cycle2/nombres/multiplication/multiplier_par_4_et_8.md"
+              },
+              {
+                "nom": "Multiplier par des dizaines",
+                "type": "fichier",
+                "path": "cycle2/nombres/multiplication/multiplier_par_dizaines.md"
+              }
+            ]
           },
           {
-            "nom": "Les doubles (centaines)",
-            "type": "fichier",
-            "path": "cycle2/nombres/doubles_centaines.md"
-          },
-          {
-            "nom": "Les moitiés (de 2 à 40)",
-            "type": "fichier",
-            "path": "cycle2/nombres/moities_pairs_2_a_40.md"
-          },
-          {
-            "nom": "Les moitiés (dizaines entières)",
-            "type": "fichier",
-            "path": "cycle2/nombres/moities_dizaines.md"
-          },
-          {
-            "nom": "Les moitiés (grandes centaines)",
-            "type": "fichier",
-            "path": "cycle2/nombres/moities_grandes_centaines.md"
+            "nom": "Doubles & Moitiés",
+            "type": "dossier",
+            "contenu": [
+                {
+                    "nom": "Les doubles de 1 à 20",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/doubles_1_a_20.md"
+                },
+                {
+                    "nom": "Les doubles (nombres ronds)",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/doubles_specifiques.md"
+                },
+                {
+                    "nom": "Les doubles (centaines)",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/doubles_centaines.md"
+                },
+                {
+                    "nom": "Les moitiés (de 2 à 40)",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/moities_pairs_2_a_40.md"
+                },
+                {
+                    "nom": "Les moitiés (dizaines entières)",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/moities_dizaines.md"
+                },
+                {
+                    "nom": "Les moitiés (grandes centaines)",
+                    "type": "fichier",
+                    "path": "cycle2/nombres/moities_grandes_centaines.md"
+                }
+            ]
           }
         ]
       },
@@ -110,6 +179,17 @@
         "nom": "🔢 Nombres et calculs",
         "type": "dossier",
         "contenu": [
+          {
+            "nom": "Multiplication",
+            "type": "dossier",
+            "contenu": [
+              {
+                "nom": "Multiplication par décomposition",
+                "type": "fichier",
+                "path": "cycle3/nombres/multiplication/multiplication_distributive.md"
+              }
+            ]
+          },
           {
             "nom": "Fractions & Décimaux",
             "type": "fichier",

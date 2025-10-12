@@ -170,19 +170,27 @@ export function adjustCardHeight() {
 /**
  * Construit le menu en arborescence de la bibliothèque de decks.
  */
-export function buildTreeMenu(parentElement, items, onFileClick) {
+export function buildTreeMenu(parentElement, items, onFileClick, filterActive = false) {
+    let visibleItemCount = 0;
+
     for (const item of items) {
+        // Condition de filtrage : on saute les decks qui ne sont pas à réviser si le filtre est actif
+        if (filterActive && item.type === 'fichier' && item.deckStatus !== 'due') {
+            continue;
+        }
+
         const li = document.createElement('li');
         const span = document.createElement('span');
         span.textContent = item.nom;
 
-        if (item.type === 'fichier') {
+        // On n'affiche l'indicateur que si le deck a été commencé
+        if (item.type === 'fichier' && item.deckStatus !== 'new') {
             const indicator = document.createElement('i');
             indicator.className = 'deck-status';
-            if (item.hasDueCards) {
+            if (item.deckStatus === 'due') {
                 indicator.textContent = '🔔';
                 indicator.title = 'Des cartes sont à réviser !';
-            } else {
+            } else { // 'up-to-date'
                 indicator.textContent = '✅';
                 indicator.title = 'Vous êtes à jour !';
             }
@@ -196,15 +204,20 @@ export function buildTreeMenu(parentElement, items, onFileClick) {
             const subUl = document.createElement('ul');
             li.appendChild(subUl);
             span.onclick = () => li.classList.toggle('collapsed');
-            if (item.contenu && item.contenu.length > 0) {
-                buildTreeMenu(subUl, item.contenu, onFileClick);
+            
+            // Si le sous-menu a des éléments visibles, on affiche le dossier
+            if (item.contenu && buildTreeMenu(subUl, item.contenu, onFileClick, filterActive) > 0) {
+                parentElement.appendChild(li);
+                visibleItemCount++;
             }
-        } else {
+        } else { // type 'fichier'
             li.className = 'deck-file';
             span.onclick = () => onFileClick(item);
+            parentElement.appendChild(li);
+            visibleItemCount++;
         }
-        parentElement.appendChild(li);
     }
+    return visibleItemCount;
 }
 
 /**

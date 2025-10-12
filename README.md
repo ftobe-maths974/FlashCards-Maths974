@@ -47,4 +47,4 @@ Le code est organisé de manière modulaire pour une meilleure clarté :
 
 ## 📜 Licence
 
-Ce projet est distribué sous la **Licence MIT**. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+Ce projet est distribué sous la **Licence MIT**. Voir le fichier [LICENSE](LICENSE) pour plus de détails. 

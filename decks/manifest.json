@@ -55,8 +55,12 @@
                 "nom": "Table de 10",
                 "type": "fichier",
                 "path": "cycle2/nombres/tables-multiplication/table_de_10.md"
+              },
+              {
+                "nom": "Mélange de tables",
+                "type": "fichier",
+                "path": "cycle2/nombres/tables-multiplication/melange_tables.md"
               }
-              
             ]
           },
           {

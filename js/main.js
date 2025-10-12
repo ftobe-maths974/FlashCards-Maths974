@@ -9,6 +9,8 @@ import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedThe
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
 
+const deckFilterSwitch = document.getElementById('deck-filter-switch');
+
 // --- Gestionnaires d'événements ---
 
 let deckToLoad = null; // Stockage temporaire des infos du deck à charger
@@ -20,8 +22,11 @@ let deckToLoad = null; // Stockage temporaire des infos du deck à charger
 async function buildAndShowLibrary() {
     let manifest = await fetchDeckLibrary();
     manifest = await getDecksWithStatus(manifest);
-    DOM.deckTreeContainer.innerHTML = ''; // On vide l'ancien menu
-    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection);
+    DOM.deckTreeContainer.innerHTML = '';
+    
+    // On vérifie si le filtre est actif et on le passe à la fonction
+    const filterIsActive = deckFilterSwitch.checked;
+    buildTreeMenu(DOM.deckTreeContainer, manifest, handleDeckSelection, filterIsActive);
 }
 
 /**
@@ -135,6 +140,9 @@ function setupEventListeners() {
             }
         }
     });
+    
+    deckFilterSwitch.addEventListener('change', buildAndShowLibrary);
+
 }
 
 /**

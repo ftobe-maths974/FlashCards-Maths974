@@ -60,9 +60,15 @@
             ]
           },
           {
-            "nom": "Addition & Soustraction",
-            "type": "fichier",
-            "path": "cycle2/nombres/operations.md"
+            "nom": "Addition",
+            "type": "dossier",
+            "contenu": [
+              {
+                "nom": "Mémoriser les tables d'addition",
+                "type": "fichier",
+                "path": "cycle2/nombres/addition/ce2_tables_addition.md"
+              }
+            ]
           }
         ]
       },

@@ -8,86 +8,85 @@
         "type": "dossier",
         "contenu": [
           {
-            "nom": "Tables de multiplication",
+            "nom": "Multiplication",
             "type": "dossier",
             "contenu": [
               {
                 "nom": "Table de 2",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_2.md"
+                "path": "cycle2/nombres/multiplication/table_de_2.md"
               },
               {
                 "nom": "Table de 3",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_3.md"
+                "path": "cycle2/nombres/multiplication/table_de_3.md"
               },
               {
                 "nom": "Table de 4",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_4.md"
+                "path": "cycle2/nombres/multiplication/table_de_4.md"
               },
               {
                 "nom": "Table de 5",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_5.md"
+                "path": "cycle2/nombres/multiplication/table_de_5.md"
               },
               {
                 "nom": "Table de 6",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_6.md"
+                "path": "cycle2/nombres/multiplication/table_de_6.md"
               },
               {
                 "nom": "Table de 7",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_7.md"
+                "path": "cycle2/nombres/multiplication/table_de_7.md"
               },
               {
                 "nom": "Table de 8",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_8.md"
+                "path": "cycle2/nombres/multiplication/table_de_8.md"
               },
               {
                 "nom": "Table de 9",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_9.md"
+                "path": "cycle2/nombres/multiplication/table_de_9.md"
               },
               {
                 "nom": "Table de 10",
                 "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/table_de_10.md"
-              },
-              {
-                "nom": "Mélange de tables",
-                "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/melange_tables.md"
-              },
-              {
-                "nom": "Les doubles de 1 à 20",
-                "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/doubles_1_a_20.md"
-              },
-              {
-                "nom": "Les doubles de 20 à 100",
-                "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/doubles_20_a_100.md"
-              },
-              {
-                "nom": "Les doubles de 100 à 1000",
-                "type": "fichier",
-                "path": "cycle2/nombres/tables-multiplication/doubles_100_a_1000.md"
+                "path": "cycle2/nombres/multiplication/table_de_10.md"
               }
             ]
           },
           {
-            "nom": "Addition",
-            "type": "dossier",
-            "contenu": [
-              {
-                "nom": "Mémoriser les tables d'addition",
-                "type": "fichier",
-                "path": "cycle2/nombres/addition/ce2_tables_addition.md"
-              }
-            ]
+            "nom": "Les doubles de 1 à 20",
+            "type": "fichier",
+            "path": "cycle2/nombres/doubles_1_a_20.md"
+          },
+          {
+            "nom": "Les doubles (nombres ronds)",
+            "type": "fichier",
+            "path": "cycle2/nombres/doubles_specifiques.md"
+          },
+          {
+            "nom": "Les doubles (centaines)",
+            "type": "fichier",
+            "path": "cycle2/nombres/doubles_centaines.md"
+          },
+          {
+            "nom": "Les moitiés (de 2 à 40)",
+            "type": "fichier",
+            "path": "cycle2/nombres/moities_pairs_2_a_40.md"
+          },
+          {
+            "nom": "Les moitiés (dizaines entières)",
+            "type": "fichier",
+            "path": "cycle2/nombres/moities_dizaines.md"
+          },
+          {
+            "nom": "Les moitiés (grandes centaines)",
+            "type": "fichier",
+            "path": "cycle2/nombres/moities_grandes_centaines.md"
           }
         ]
       },
@@ -115,6 +114,11 @@
             "nom": "Fractions & Décimaux",
             "type": "fichier",
             "path": "cycle3/nombres/fractions_decimaux.md"
+          },
+          {
+            "nom": "Proportionnalité",
+            "type": "fichier",
+            "path": "cycle3/nombres/proportionnalite.md"
           }
         ]
       }

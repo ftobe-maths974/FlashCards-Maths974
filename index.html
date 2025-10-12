@@ -24,6 +24,7 @@
         <main>
             <div id="welcome-screen">
                 <h2>Bibliothèque de Decks</h2>
+                
                 <div class="filter-switch-container">
                     <label for="deck-filter-switch">Afficher uniquement les decks à réviser</label>
                     <label class="switch">
@@ -31,22 +32,8 @@
                         <span class="slider round"></span>
                     </label>
                 </div>
+                
                 <p>Choisissez un deck à étudier.</p>
-            
-                <details class="help-section">
-                    <summary>Comment ça marche ? 🤔</summary>
-                    <div>
-                        <p>Imagine que chaque carte est un monstre de jeu vidéo que tu dois battre !</p>
-                        <ul>
-                            <li>Quand tu rencontres un monstre pour la première fois (une nouvelle carte), il est très fort.</li>
-                            <li>Si tu le bats facilement (<strong>Facile</strong>), il ne reviendra pas avant longtemps.</li>
-                            <li>Si tu as un peu de mal (<strong>Correct</strong>), il reviendra te défier demain ou après-demain.</li>
-                            <li>Si c'était très dur (<strong>Difficile</strong>), il reviendra te voir très bientôt !</li>
-                            <li>Et si tu perds (<strong>À revoir</strong>), tu devras le combattre à nouveau tout de suite !</li>
-                        </ul>
-                        <p>L'application est comme un entraîneur : elle fait revenir les monstres les plus difficiles plus souvent pour que tu deviennes un vrai champion de la mémoire ! 💪</p>
-                    </div>
-                </details>
             
                 <details class="help-section">
                     <summary>Guide des boutons et de l'interface 🧭</summary>
@@ -56,25 +43,25 @@
                             <li>
                                 <div class="guide-item">
                                     <button class="btn" id="btn-again" disabled>À revoir (1)</button>
-                                    <span>: Si vous ne connaissiez pas la réponse. La carte reviendra dans quelques minutes.</span>
+                                    <span>: La carte reviendra dans quelques minutes, et sa prochaine révision sera programmée pour **demain**.</span>
                                 </div>
                             </li>
                             <li>
                                 <div class="guide-item">
                                     <button class="btn" id="btn-hard" disabled>Difficile (2)</button>
-                                    <span>: Si vous avez eu beaucoup de mal. La carte reviendra aussi plus tard dans la session.</span>
+                                    <span>: La carte reviendra plus tard dans cette session. Sa prochaine révision sera dans **1 jour**.</span>
                                 </div>
                             </li>
                             <li>
                                 <div class="guide-item">
                                     <button class="btn" id="btn-good" disabled>Correct (3)</button>
-                                    <span>: Si vous avez trouvé avec une légère hésitation.</span>
+                                    <span>: Prochaine révision dans **quelques jours** (3 jours pour une nouvelle carte).</span>
                                 </div>
                             </li>
                             <li>
                                 <div class="guide-item">
                                     <button class="btn" id="btn-easy" disabled>Facile (4)</button>
-                                    <span>: Si la réponse était évidente pour vous.</span>
+                                    <span>: Prochaine révision espacée (5 jours pour une nouvelle carte, puis semaines, mois...).</span>
                                 </div>
                             </li>
                             <li>
@@ -85,7 +72,7 @@
                             </li>
                             <li>
                                 <div class="guide-item">
-                                     <button class="btn btn-quit" disabled>Sauver & retourner au menu</button>
+                                    <button class="btn btn-quit" disabled>Sauver & retourner au menu</button>
                                     <span>: Met fin à la session (votre progression est sauvegardée).</span>
                                 </div>
                             </li>

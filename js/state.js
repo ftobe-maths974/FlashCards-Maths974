@@ -138,7 +138,6 @@ export function resetDeckProgress(deckPath, deckName) {
 export async function getDecksWithStatus(manifest) {
     const today = new Date().toISOString().split('T')[0];
 
-    // Crée une fonction récursive pour parcourir l'arborescence
     async function processItems(items) {
         for (const item of items) {
             if (item.type === 'fichier') {
@@ -146,13 +145,12 @@ export async function getDecksWithStatus(manifest) {
                 const hasProgress = Object.keys(progress).length > 0;
                 
                 if (!hasProgress) {
-                    item.hasDueCards = true; // Un deck jamais commencé a des cartes à faire
+                    item.deckStatus = 'new'; // Deck jamais commencé
                 } else {
-                    // Vérifie si au moins une carte est due aujourd'hui
-                    item.hasDueCards = Object.values(progress).some(card => card.prochaine_revision <= today);
+                    const hasDueCards = Object.values(progress).some(card => card.prochaine_revision <= today);
+                    item.deckStatus = hasDueCards ? 'due' : 'up-to-date'; // À réviser ou à jour
                 }
             } else if (item.type === 'dossier' && item.contenu) {
-                // On continue la recherche dans les sous-dossiers
                 await processItems(item.contenu);
             }
         }

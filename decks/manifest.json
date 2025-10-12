@@ -40,52 +40,52 @@
                   {
                     "nom": "Table de 2",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_2.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_2.md"
                   },
                   {
                     "nom": "Table de 3",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_3.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_3.md"
                   },
                   {
                     "nom": "Table de 4",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_4.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_4.md"
                   },
                   {
                     "nom": "Table de 5",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_5.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_5.md"
                   },
                   {
                     "nom": "Table de 6",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_6.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_6.md"
                   },
                   {
                     "nom": "Table de 7",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_7.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_7.md"
                   },
                   {
                     "nom": "Table de 8",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_8.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_8.md"
                   },
                   {
                     "nom": "Table de 9",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_9.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_9.md"
                   },
                   {
                     "nom": "Table de 10",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/table_de_10.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/table_de_10.md"
                   },
                   {
                     "nom": "Mélange Tables Simples",
                     "type": "fichier",
-                    "path": "cycle2/nombres/multiplication/tables/melange_tables_simple.md"
+                    "path": "cycle2/nombres/multiplication/tables_basiques/melange_tables_simple.md"
                   }
                 ]
               },

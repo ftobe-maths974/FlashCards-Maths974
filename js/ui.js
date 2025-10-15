@@ -2,26 +2,32 @@
  * Ce module gère toutes les manipulations du DOM (l'interface utilisateur).
  */
 
+// 1. Importez les constantes
 import { appState } from './state.js';
+import { DOM_IDS, THEME_CLASSES, CSS_CLASSES, STORAGE_KEYS } from './constants.js';
 
-// --- Références aux éléments du DOM ---
+
+
+// 2. Modifiez l'objet DOM pour utiliser les constantes
 export const DOM = {
-    welcomeScreen: document.getElementById('welcome-screen'),
-    appScreen: document.getElementById('app-screen'),
-    cardContainer: document.getElementById('card-container'),
-    cardFront: document.getElementById('card-front'),
-    cardBack: document.getElementById('card-back'),
-    answerButtons: document.getElementById('answer-buttons'),
-    deckNameEl: document.getElementById('deck-name'),
-    deckProgressEl: document.getElementById('deck-progress'),
-    noCardsMessage: document.getElementById('no-cards-message'),
-    themeToggle: document.getElementById('theme-toggle'),
-    quitSessionBtn: document.getElementById('btn-quit-session'),
-    studyModeModal: document.getElementById('study-mode-modal'),
-    startSessionBtn: document.getElementById('start-session-btn'),
-    deckTreeContainer: document.getElementById('deck-tree'),
-    controls: document.getElementById('controls-container'),
-    resetDeckBtn: document.getElementById('btn-reset-deck')
+    appTitle: document.getElementById(DOM_IDS.appTitle),
+    welcomeScreen: document.getElementById(DOM_IDS.welcomeScreen),
+    appScreen: document.getElementById(DOM_IDS.appScreen),
+    errorContainer: document.getElementById(DOM_IDS.errorContainer),
+    cardContainer: document.getElementById(DOM_IDS.cardContainer),
+    cardFront: document.getElementById(DOM_IDS.cardFront),
+    cardBack: document.getElementById(DOM_IDS.cardBack),
+    answerButtons: document.getElementById(DOM_IDS.answerButtons),
+    deckNameEl: document.getElementById(DOM_IDS.deckName),
+    deckProgressEl: document.getElementById(DOM_IDS.deckProgress),
+    noCardsMessage: document.getElementById(DOM_IDS.noCardsMessage),
+    themeToggle: document.getElementById(DOM_IDS.themeToggle),
+    quitSessionBtn: document.getElementById(DOM_IDS.quitSessionBtn),
+    studyModeModal: document.getElementById(DOM_IDS.studyModeModal),
+    startSessionBtn: document.getElementById(DOM_IDS.startSessionBtn),
+    deckTreeContainer: document.getElementById(DOM_IDS.deckTree),
+    controls: document.getElementById(DOM_IDS.controls),
+    resetDeckBtn: document.getElementById(DOM_IDS.resetDeckBtn)
 };
 
 /**
@@ -29,42 +35,48 @@ export const DOM = {
  */
 // DANS LE FICHIER js/ui.js, REMPLACEZ LA FONCTION RENDER EXISTANTE :
 
+// Dans js/ui.js
+
 export function render() {
+    console.log("5. Appel de render()");
     if (!appState.deckName) {
-        // --- Écran d'accueil ---
-        DOM.welcomeScreen.classList.remove('hidden');
-        DOM.appScreen.classList.add('hidden');
+        console.log("-> Affichage de l'écran d'accueil.");
+        DOM.welcomeScreen.classList.remove(CSS_CLASSES.hidden);
+        DOM.appScreen.classList.add(CSS_CLASSES.hidden);
     } else {
-        // --- Écran de session d'étude ---
-        DOM.welcomeScreen.classList.add('hidden');
-        DOM.appScreen.classList.remove('hidden');
+        console.log("-> Affichage de l'écran de session.");
+        DOM.welcomeScreen.classList.add(CSS_CLASSES.hidden);
+        DOM.appScreen.classList.remove(CSS_CLASSES.hidden);
         
         const today = new Date().toISOString().split('T')[0];
         appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
+        console.log(`6. Cartes à réviser trouvées :`, appState.dueCards.length);
+        
+        // J'enlève temporairement le mélange pour le débogage.
+        // shuffleArray(appState.dueCards);
         
         DOM.deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
-        DOM.controls.classList.remove('hidden');
+        DOM.controls.classList.remove(CSS_CLASSES.hidden);
+
+        console.log("CHECKPOINT : Juste avant le 'if', dueCards.length =", appState.dueCards.length);
 
         if (appState.dueCards.length > 0) {
-            // S'il y a des cartes à réviser
+            console.log("7. BLOC IF : Correct, il y a des cartes. Préparation de la première.");
             appState.currentCardIndex = 0;
-            DOM.cardContainer.classList.remove('hidden');
-            DOM.noCardsMessage.classList.add('hidden');
+            DOM.cardContainer.classList.remove(CSS_CLASSES.hidden);
+            DOM.noCardsMessage.classList.add(CSS_CLASSES.hidden);
             
-            // --- CORRECTION APPLIQUÉE ICI ---
-            // On prépare la première carte...
-            prepareNextCard(); 
-            // ...et on s'assure qu'elle est bien visible.
+            prepareNextCard();
+            
             const cardInner = DOM.cardContainer.querySelector('.card-inner');
             cardInner.style.opacity = '1';
-            // --- FIN DE LA CORRECTION ---
 
         } else {
-            // S'il n'y a AUCUNE carte à réviser pour aujourd'hui
+            console.log("7. BLOC ELSE : Incorrect, aucune carte à réviser n'a été trouvée.");
             DOM.deckProgressEl.textContent = `À réviser: 0`;
-            DOM.cardContainer.classList.add('hidden');
-            DOM.answerButtons.classList.add('hidden');
-            DOM.noCardsMessage.classList.remove('hidden');
+            DOM.cardContainer.classList.add(CSS_CLASSES.hidden);
+            DOM.answerButtons.classList.add(CSS_CLASSES.hidden);
+            DOM.noCardsMessage.classList.remove(CSS_CLASSES.hidden);
         }
     }
 }
@@ -73,42 +85,47 @@ export function render() {
  * Gère l'animation de retournement de la carte.
  */
 export function flipCard() {
-    if (appState.dueCards.length > 0) {
-        DOM.cardContainer.classList.add('is-flipped');
-        DOM.answerButtons.classList.remove('hidden');
+    // On ne retourne la carte que si elle est du côté question
+    if (appState.dueCards.length > 0 && !DOM.cardContainer.classList.contains(CSS_CLASSES.flipped)) {
+        DOM.cardContainer.classList.add(CSS_CLASSES.flipped);
+        DOM.answerButtons.classList.remove(CSS_CLASSES.hidden);
+        
+        // On met le focus sur le bouton "Correct"
+        setTimeout(() => {
+            DOM.answerButtons.querySelector('#' + DOM_IDS.buttons.good).focus();
+        }, 10);
     }
 }
 
 /**
- * Orchestre la transition visuelle entre deux cartes. C'est la solution au bug visuel.
+ * Orchestre la transition visuelle entre deux cartes.
  */
 export function transitionToNextCard() {
     const cardInner = DOM.cardContainer.querySelector('.card-inner');
 
-    // ÉTAPE 1 : On cache les boutons et on fait disparaître la carte actuelle.
-    DOM.answerButtons.classList.add('hidden');
+    // Étape 1 : On fait disparaître la carte et les boutons
+    DOM.answerButtons.classList.add(CSS_CLASSES.hidden);
     cardInner.style.opacity = '0';
     
-    // ÉTAPE 2 : On attend la fin de l'animation de disparition.
+    // Étape 2 : On attend la fin de l'animation de disparition
     setTimeout(() => {
-        // --- La carte est maintenant invisible ---
+        // La carte est maintenant invisible
 
-        // ÉTAPE 3 : On la retourne côté "question" SANS animation.
-        cardInner.style.transition = 'none';
-        DOM.cardContainer.classList.remove('is-flipped');
+        // Étape 3 : On prépare le contenu de la nouvelle carte
+        prepareNextCard(); 
         
-        // On force le navigateur à appliquer ce changement immédiatement.
-        cardInner.offsetHeight; 
-
-        // ÉTAPE 4 : On affiche la nouvelle carte (qui remplit la carte vide).
-        showCard(); 
+        // Étape 4 : On retourne la carte SANS animation
+        cardInner.style.transition = 'none'; 
+        DOM.cardContainer.classList.remove(CSS_CLASSES.flipped);
+        cardInner.offsetHeight; // Force le navigateur à appliquer le changement
         
-        // ÉTAPE 5 : On réactive les animations et on fait réapparaître le tout.
+        // Étape 5 : On réactive les animations et on fait réapparaître la carte
         cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
         cardInner.style.opacity = '1';
 
-    }, 200); // Durée de l'animation d'opacité
+    }, 200); // Doit correspondre à la durée de la transition d'opacité
 }
+
 
 /**
  * Remplit la carte avec le contenu de la question/réponse actuelle.
@@ -116,25 +133,19 @@ export function transitionToNextCard() {
  */
 // DANS LE FICHIER js/ui.js, remplacez la fonction showCard existante par celle-ci
 
-/**
- * Prépare la carte suivante (remplit le contenu, ajuste la hauteur) PENDANT qu'elle est invisible.
- * Ne gère aucune animation de visibilité.
- */
 export function prepareNextCard() {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
+    // ▼▼▼ LA LIGNE MANQUANTE EST ICI ▼▼▼
     const cardInner = DOM.cardContainer.querySelector('.card-inner');
-    
-    // Met à jour le compteur.
+
     const remainingCards = appState.dueCards.length - appState.currentCardIndex;
     DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
 
-    // Prépare la carte sans animation.
-    cardInner.style.transition = 'none';
-    DOM.cardContainer.classList.remove('is-flipped');
-    
-    // Remplit le contenu.
+    DOM.cardContainer.focus({ preventScroll: true });
+
+    // Remplit le contenu de la carte
     let questionText = card.Question;
     let answerText = card.Réponse;
     let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
@@ -142,19 +153,17 @@ export function prepareNextCard() {
     DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
     DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
 
+    // Met à jour le rendu des formules mathématiques
     if (window.renderMathInElement) {
         const options = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
         window.renderMathInElement(DOM.cardFront, options);
         window.renderMathInElement(DOM.cardBack, options);
     }
-    adjustCardHeight();
-
-    // On force le navigateur à appliquer les changements.
-    cardInner.offsetHeight; 
     
-    // On réactive les transitions pour les futures interactions (flip, et le fondu entrant).
-    cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
+    // Ajuste la hauteur de la carte
+    adjustCardHeight();
 }
+
 
 /**
  * Ajuste dynamiquement la hauteur de la carte en fonction de son contenu.
@@ -182,6 +191,9 @@ export function buildTreeMenu(parentElement, items, onFileClick, filterActive = 
         const li = document.createElement('li');
         const span = document.createElement('span');
         span.textContent = item.nom;
+        span.setAttribute('role', 'button'); // Indique que c'est un élément cliquable
+        span.setAttribute('tabindex', '0');   // Le rend focusable au clavier
+
 
         // On n'affiche l'indicateur que si le deck a été commencé
         if (item.type === 'fichier' && item.deckStatus !== 'new') {
@@ -201,11 +213,16 @@ export function buildTreeMenu(parentElement, items, onFileClick, filterActive = 
 
         if (item.type === 'dossier') {
             li.className = 'deck-folder collapsed';
+            span.setAttribute('aria-expanded', 'false'); // Indique que le dossier est fermé
             const subUl = document.createElement('ul');
             li.appendChild(subUl);
-            span.onclick = () => li.classList.toggle('collapsed');
+            span.onclick = () => {
+                li.classList.toggle('collapsed');
+                // Met à jour l'état pour les lecteurs d'écran
+                const isExpanded = !li.classList.contains('collapsed');
+                span.setAttribute('aria-expanded', isExpanded);
+            };
             
-            // Si le sous-menu a des éléments visibles, on affiche le dossier
             if (item.contenu && buildTreeMenu(subUl, item.contenu, onFileClick, filterActive) > 0) {
                 parentElement.appendChild(li);
                 visibleItemCount++;
@@ -213,6 +230,12 @@ export function buildTreeMenu(parentElement, items, onFileClick, filterActive = 
         } else { // type 'fichier'
             li.className = 'deck-file';
             span.onclick = () => onFileClick(item);
+            // Permet l'activation avec la touche "Entrée"
+            span.onkeydown = (e) => {
+                if (e.code === 'Enter' || e.code === 'Space') {
+                    onFileClick(item);
+                }
+            };
             parentElement.appendChild(li);
             visibleItemCount++;
         }
@@ -231,22 +254,43 @@ export function promptStudyMode() {
  * Gère le changement de thème (clair/sombre).
  */
 export function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
+    document.body.classList.toggle(THEME_CLASSES.dark);
+    const isDark = document.body.classList.contains(THEME_CLASSES.dark);
     DOM.themeToggle.textContent = isDark ? '☀️' : '🌙';
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    localStorage.setItem(STORAGE_KEYS.theme, isDark ? 'dark' : 'light');
 }
 
 /**
  * Applique le thème sauvegardé au chargement de la page.
  */
 export function applySavedTheme() {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
     if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
+        document.body.classList.add(THEME_CLASSES.dark);
         DOM.themeToggle.textContent = '☀️';
     } else {
-        document.body.classList.remove('dark-mode');
+        document.body.classList.remove(THEME_CLASSES.dark);
         DOM.themeToggle.textContent = '🌙';
     }
 }
+
+/**
+ * Affiche un message d'erreur dans l'interface.
+ * @param {string} message Le message à afficher.
+ */
+export function displayError(message) {
+    DOM.errorContainer.textContent = message;
+    DOM.errorContainer.classList.remove('hidden');
+}
+
+/**
+ * Efface le message d'erreur de l'interface.
+ */
+export function clearError() {
+    if (!DOM.errorContainer.classList.contains('hidden')) {
+        DOM.errorContainer.classList.add('hidden');
+        DOM.errorContainer.textContent = '';
+    }
+}
+
+

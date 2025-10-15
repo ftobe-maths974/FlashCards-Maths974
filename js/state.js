@@ -4,6 +4,9 @@
  * dans le localStorage, empêchant toute contamination entre les decks.
  */
 
+// 1. Importez les constantes
+import { STORAGE_KEYS } from './constants.js';
+
 // L'état de la session en cours, en mémoire vive.
 export let appState = { 
     deckName: null,

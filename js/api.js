@@ -40,7 +40,6 @@ export async function fetchDeckFile(path) {
         return cardsData;
     } catch (error) {
         console.error(`Erreur lors du chargement du deck ${path}`, error);
-        alert(`Erreur lors du chargement du deck. Vérifiez la console pour plus de détails.`);
-        return [];
+        throw error;
     }
 }

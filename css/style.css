@@ -55,6 +55,11 @@ h1 {
     font-size: 24px;
 }
 
+#app-title {
+    cursor: pointer;
+    user-select: none; /* Empêche la sélection du texte au clic */
+}
+
 #theme-toggle {
     background: none;
     border: 1px solid var(--grey-dark);
@@ -393,3 +398,40 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
+/* Dans css/style.css (à la fin du fichier) */
+
+.error-message {
+    background-color: #e57373; /* Couleur de danger de votre thème */
+    color: #ffffff; /* Texte blanc pour la lisibilité */
+    padding: 12px;
+    border-radius: var(--border-radius);
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.card-inner.feedback-good {
+    animation: flash-green 0.4s ease-out;
+}
+.card-inner.feedback-easy {
+    animation: flash-blue 0.4s ease-out;
+}
+.card-inner.feedback-hard {
+    animation: flash-orange 0.4s ease-out;
+}
+.card-inner.feedback-again {
+    animation: flash-red 0.4s ease-out;
+}
+
+@keyframes flash-green {
+    50% { box-shadow: 0 0 20px 5px var(--success); }
+}
+@keyframes flash-blue {
+    50% { box-shadow: 0 0 20px 5px var(--primary-color); }
+}
+@keyframes flash-orange {
+    50% { box-shadow: 0 0 20px 5px var(--warning); }
+}
+@keyframes flash-red {
+    50% { box-shadow: 0 0 20px 5px var(--danger); }
+}

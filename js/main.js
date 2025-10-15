@@ -4,12 +4,13 @@
  */
 
 // --- Import des modules ---
+import { DOM_IDS, CSS_CLASSES } from './constants.js';
 import { appState, initializeDeck, resetApp, resetDeckProgress, getDecksWithStatus } from './state.js';
-import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, prepareNextCard } from './ui.js';
+import { DOM, render, buildTreeMenu, promptStudyMode, toggleTheme, applySavedTheme, flipCard, prepareNextCard, displayError, clearError, transitionToNextCard } from './ui.js';
 import { fetchDeckLibrary, fetchDeckFile } from './api.js';
 import { processAnswer } from './srs.js';
 
-const deckFilterSwitch = document.getElementById('deck-filter-switch');
+const deckFilterSwitch = document.getElementById(DOM_IDS.filterSwitch);
 
 // --- Gestionnaires d'événements ---
 
@@ -20,6 +21,7 @@ let deckToLoad = null; // Stockage temporaire des infos du deck à charger
  * Cette fonction est appelée au démarrage ET en quittant une session pour tout mettre à jour.
  */
 async function buildAndShowLibrary() {
+    clearError();
     let manifest = await fetchDeckLibrary();
     manifest = await getDecksWithStatus(manifest);
     DOM.deckTreeContainer.innerHTML = '';
@@ -42,20 +44,30 @@ function handleDeckSelection(deckInfo) {
  * Lance une nouvelle session d'étude après le choix du mode.
  */
 async function startNewSession() {
+    console.log("--- Début de la session ---");
     const selectedMode = document.querySelector('input[name="study-mode"]:checked').value;
-    DOM.studyModeModal.classList.add('hidden');
+    DOM.studyModeModal.classList.add(CSS_CLASSES.hidden);
 
     if (deckToLoad && deckToLoad.info) {
-        if (deckToLoad.type === 'permanent') {
+        try {
+            console.log("1. Chargement du fichier de deck :", deckToLoad.info.path);
             const deckData = await fetchDeckFile(deckToLoad.info.path);
+            console.log("2. Données du deck chargées :", deckData);
+
             if (deckData && deckData.length > 0) {
+                console.log("3. Le deck n'est pas vide. Initialisation...");
                 initializeDeck(deckData, deckToLoad.info.nom, deckToLoad.info.path, selectedMode);
+                console.log("4. État de l'application après initialisation :", JSON.parse(JSON.stringify(appState)));
                 render();
             } else {
-                alert('Ce deck est vide ou n\'a pas pu être lu.');
+                displayError(`Le deck "${deckToLoad.info.nom}" est vide ou n'a pas pu être lu.`);
+                buildAndShowLibrary();
             }
+        } catch (error) {
+            displayError(`Erreur: Impossible de charger le deck "${deckToLoad.info.nom}".`);
+        } finally {
+            deckToLoad = null;
         }
-        deckToLoad = null;
     }
 }
 
@@ -66,11 +78,20 @@ function handleCardAnswer(quality) {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
-    DOM.answerButtons.classList.add('hidden');
     const cardInner = DOM.cardContainer.querySelector('.card-inner');
+    const feedbackMap = { 1: 'feedback-again', 2: 'feedback-hard', 3: 'feedback-good', 4: 'feedback-easy' };
+    
+    // Amélioration : Ajoute le retour visuel et lance la disparition
+    cardInner.classList.add(feedbackMap[quality]);
+    DOM.answerButtons.classList.add(CSS_CLASSES.hidden);
     cardInner.style.opacity = '0';
 
+    // Attend la fin des animations
     setTimeout(() => {
+        // Nettoie la classe de l'animation pour la prochaine carte
+        cardInner.classList.remove(feedbackMap[quality]);
+        
+        // Applique la logique SRS et détermine la carte suivante
         processAnswer(card, quality);
         
         if (quality <= 2) {
@@ -82,19 +103,35 @@ function handleCardAnswer(quality) {
             appState.currentCardIndex++;
         }
 
+        // Affiche la carte suivante ou le message de fin
         if (appState.currentCardIndex < appState.dueCards.length) {
             prepareNextCard();
-            cardInner.style.opacity = '1';
+            
+            cardInner.style.transition = 'none';
+            DOM.cardContainer.classList.remove(CSS_CLASSES.flipped);
+            
+            void cardInner.offsetWidth; // Force le navigateur à appliquer le changement
+            
+            cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
+            cardInner.style.opacity = '1'; // Fait réapparaître la nouvelle carte
         } else {
-            render();
+            DOM.cardContainer.classList.add(CSS_CLASSES.hidden);
+            DOM.noCardsMessage.classList.remove(CSS_CLASSES.hidden);
         }
-    }, 200);
+    }, 400); // Délai qui correspond à l'animation CSS
 }
 
 /**
  * Met en place tous les écouteurs d'événements de l'application.
  */
 function setupEventListeners() {
+    DOM.appTitle.addEventListener('click', () => {
+        // Exécute la même logique que le bouton pour quitter
+        resetApp();
+        render();
+        buildAndShowLibrary();
+    });
+    
     DOM.themeToggle.addEventListener('click', toggleTheme);
 
     DOM.quitSessionBtn.addEventListener('click', () => {
@@ -106,29 +143,21 @@ function setupEventListeners() {
     DOM.startSessionBtn.addEventListener('click', startNewSession);
     DOM.studyModeModal.addEventListener('click', (e) => {
         if (e.target === DOM.studyModeModal) {
-            DOM.studyModeModal.classList.add('hidden');
+            DOM.studyModeModal.classList.add(CSS_CLASSES.hidden);
         }
     });
 
     DOM.cardContainer.addEventListener('click', flipCard);
+    
     DOM.answerButtons.addEventListener('click', (e) => {
         if (e.target.tagName !== 'BUTTON') return;
-        const qualityMap = { 'btn-again': 1, 'btn-hard': 2, 'btn-good': 3, 'btn-easy': 4 };
+        const qualityMap = {
+            [DOM_IDS.buttons.again]: 1,
+            [DOM_IDS.buttons.hard]: 2,
+            [DOM_IDS.buttons.good]: 3,
+            [DOM_IDS.buttons.easy]: 4
+        };
         handleCardAnswer(qualityMap[e.target.id]);
-    });
-    
-    document.addEventListener('keydown', (e) => {
-        if (appState.deckName && appState.dueCards.length > 0) {
-            if (e.code === 'Space' && !DOM.cardContainer.classList.contains('is-flipped')) {
-                e.preventDefault();
-                flipCard();
-            } else if (DOM.cardContainer.classList.contains('is-flipped')) {
-                const qualityMap = { 'Digit1': 1, 'Digit2': 2, 'Digit3': 3, 'Digit4': 4 };
-                if (qualityMap[e.code]) {
-                    handleCardAnswer(qualityMap[e.code]);
-                }
-            }
-        }
     });
 
     DOM.resetDeckBtn.addEventListener('click', () => {
@@ -143,8 +172,45 @@ function setupEventListeners() {
     
     deckFilterSwitch.addEventListener('change', buildAndShowLibrary);
 
-}
+    // --- NOUVEL ÉCOUTEUR CLAVIER UNIFIÉ ---
+    document.addEventListener('keydown', (e) => {
+        // On s'assure qu'une session est bien en cours
+        if (!appState.deckName || appState.dueCards.length === 0) return;
 
+        const isFlipped = DOM.cardContainer.classList.contains(CSS_CLASSES.flipped);
+
+        if (isFlipped) {
+            // --- LA CARTE EST CÔTÉ RÉPONSE ---
+
+            // On définit les touches qui valident une réponse
+            const qualityMap = {
+                'Digit1': 1, 'Numpad1': 1,
+                'Digit2': 2, 'Numpad2': 2,
+                'Digit3': 3, 'Numpad3': 3,
+                'Digit4': 4, 'Numpad4': 4,
+                'Enter': 3 // Entrée valide comme "Correct"
+            };
+
+            if (qualityMap[e.code]) {
+                // Si la touche est une touche de validation, on l'utilise
+                e.preventDefault();
+                handleCardAnswer(qualityMap[e.code]);
+            } else if (e.code === 'Space') {
+                // Si c'est la barre d'espace, on l'empêche d'agir sur les boutons
+                e.preventDefault();
+            }
+
+        } else {
+            // --- LA CARTE EST CÔTÉ QUESTION ---
+
+            // Seules les touches Espace et Entrée peuvent retourner la carte
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                flipCard();
+            }
+        }
+    });
+}
 /**
  * Fonction d'initialisation de l'application.
  */

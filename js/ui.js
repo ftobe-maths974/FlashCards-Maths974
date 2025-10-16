@@ -78,7 +78,7 @@ export function prepareNextCard() {
     
     // On initialise les graphiques
     initializeD3(DOM.cardFront);
-    initializeD3(DOM.cardBack);
+
     
     adjustCardHeight();
 }
@@ -110,6 +110,9 @@ function initializeD3(cardFace) {
 export function flipCard() {
     if (appState.dueCards.length > 0 && !DOM.cardContainer.classList.contains(CSS_CLASSES.flipped)) {
         DOM.cardContainer.classList.add(CSS_CLASSES.flipped);
+        
+        initializeD3(DOM.cardBack);
+        
         DOM.answerButtons.classList.remove(CSS_CLASSES.hidden);
         setTimeout(() => {
             DOM.answerButtons.querySelector('#' + DOM_IDS.buttons.good).focus();

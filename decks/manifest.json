@@ -105,6 +105,16 @@
                 "path": "cycle3/nombres/1.3.chiffre_nombre_de.md"
               },
               {
+                "nom": "1.4.Graduer un axe avec des entiers",
+                "type": "fichier",
+                "path": "cycle3/nombres/1.4.graduer_axe_entiers.md"
+              },
+              {
+                "nom": "1.5.Représenter un entier sur un axe",
+                "type": "fichier",
+                "path": "cycle3/nombres/1.5.representer_entier_axe.md"
+              },
+              {
                 "nom": "1.6.Comparer des entiers",
                 "type": "fichier",
                 "path": "cycle3/nombres/1.6.comparaison_entiers.md"
@@ -128,6 +138,11 @@
                 "nom": "2.5.Graduer et placer des fractions",
                 "type": "fichier",
                 "path": "cycle3/nombres/2.5.graduer_placer_fractions.md"
+              },
+              {
+                "nom": "2.9 Comparer des fractions",
+                "type": "fichier",
+                "path": "cycle3/nombres/2.9.comparer_fractions.md"
               }
             ]
           }

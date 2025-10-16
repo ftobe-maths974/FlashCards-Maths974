@@ -1,14 +1,7 @@
-/**
- * Ce module gère toutes les manipulations du DOM (l'interface utilisateur).
- */
-
-// 1. Importez les constantes
 import { appState } from './state.js';
 import { DOM_IDS, THEME_CLASSES, CSS_CLASSES, STORAGE_KEYS } from './constants.js';
+import { shuffleArray } from './utils.js';
 
-
-
-// 2. Modifiez l'objet DOM pour utiliser les constantes
 export const DOM = {
     appTitle: document.getElementById(DOM_IDS.appTitle),
     welcomeScreen: document.getElementById(DOM_IDS.welcomeScreen),
@@ -30,49 +23,31 @@ export const DOM = {
     resetDeckBtn: document.getElementById(DOM_IDS.resetDeckBtn)
 };
 
-/**
- * Fonction de rendu principale. Met à jour l'UI en fonction de l'état actuel.
- */
-// DANS LE FICHIER js/ui.js, REMPLACEZ LA FONCTION RENDER EXISTANTE :
-
-// Dans js/ui.js
-
 export function render() {
-    console.log("5. Appel de render()");
     if (!appState.deckName) {
-        console.log("-> Affichage de l'écran d'accueil.");
         DOM.welcomeScreen.classList.remove(CSS_CLASSES.hidden);
         DOM.appScreen.classList.add(CSS_CLASSES.hidden);
     } else {
-        console.log("-> Affichage de l'écran de session.");
         DOM.welcomeScreen.classList.add(CSS_CLASSES.hidden);
         DOM.appScreen.classList.remove(CSS_CLASSES.hidden);
-        
         const today = new Date().toISOString().split('T')[0];
         appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
-        console.log(`6. Cartes à réviser trouvées :`, appState.dueCards.length);
-        
-        // J'enlève temporairement le mélange pour le débogage.
-        // shuffleArray(appState.dueCards);
-        
+        shuffleArray(appState.dueCards);
         DOM.deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
         DOM.controls.classList.remove(CSS_CLASSES.hidden);
 
-        console.log("CHECKPOINT : Juste avant le 'if', dueCards.length =", appState.dueCards.length);
-
         if (appState.dueCards.length > 0) {
-            console.log("7. BLOC IF : Correct, il y a des cartes. Préparation de la première.");
             appState.currentCardIndex = 0;
-            DOM.cardContainer.classList.remove(CSS_CLASSES.hidden);
             DOM.noCardsMessage.classList.add(CSS_CLASSES.hidden);
+            DOM.cardContainer.classList.remove(CSS_CLASSES.flipped);
+            DOM.answerButtons.classList.add(CSS_CLASSES.hidden);
+            DOM.cardContainer.classList.remove(CSS_CLASSES.hidden);
             
-            prepareNextCard();
-            
-            const cardInner = DOM.cardContainer.querySelector('.card-inner');
-            cardInner.style.opacity = '1';
-
+            // On demande au navigateur de préparer la carte juste avant le prochain rafraîchissement.
+            requestAnimationFrame(() => {
+                prepareNextCard();
+            });
         } else {
-            console.log("7. BLOC ELSE : Incorrect, aucune carte à réviser n'a été trouvée.");
             DOM.deckProgressEl.textContent = `À réviser: 0`;
             DOM.cardContainer.classList.add(CSS_CLASSES.hidden);
             DOM.answerButtons.classList.add(CSS_CLASSES.hidden);
@@ -81,21 +56,75 @@ export function render() {
     }
 }
 
-/**
- * Gère l'animation de retournement de la carte.
- */
+export function prepareNextCard() {
+    const card = appState.dueCards[appState.currentCardIndex];
+    if (!card) return;
+    const remainingCards = appState.dueCards.length - appState.currentCardIndex;
+    DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
+    DOM.cardContainer.focus({ preventScroll: true });
+    let questionText = card.Question;
+    let answerText = card.Réponse;
+    let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
+    
+    const options = { sanitizer: (html) => html };
+    DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '', options);
+    DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '', options);
+
+    if (window.renderMathInElement) {
+        const katexOptions = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
+        window.renderMathInElement(DOM.cardFront, katexOptions);
+        window.renderMathInElement(DOM.cardBack, katexOptions);
+    }
+    
+    // On initialise les graphiques
+    initializeD3(DOM.cardFront);
+    initializeD3(DOM.cardBack);
+    
+    adjustCardHeight();
+}
+
+function initializeD3(cardFace) {
+    const containers = cardFace.querySelectorAll('.d3-container');
+    containers.forEach(container => {
+        try {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            if (width === 0 || height === 0) return;
+
+            container.innerHTML = '';
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const drawCode = container.getAttribute('data-d3-code');
+            if (drawCode) {
+                new Function('svg', 'width', 'height', 'd3', drawCode)(svg, width, height, d3);
+            }
+        } catch (e) {
+            console.error("Erreur lors de la création du graphique D3.js:", e);
+        }
+    });
+}
+
 export function flipCard() {
-    // On ne retourne la carte que si elle est du côté question
     if (appState.dueCards.length > 0 && !DOM.cardContainer.classList.contains(CSS_CLASSES.flipped)) {
         DOM.cardContainer.classList.add(CSS_CLASSES.flipped);
         DOM.answerButtons.classList.remove(CSS_CLASSES.hidden);
-        
-        // On met le focus sur le bouton "Correct"
         setTimeout(() => {
             DOM.answerButtons.querySelector('#' + DOM_IDS.buttons.good).focus();
         }, 10);
     }
 }
+
+export function adjustCardHeight() {
+    DOM.cardContainer.style.height = 'auto';
+    const frontHeight = DOM.cardFront.scrollHeight;
+    const backHeight = DOM.cardBack.scrollHeight;
+    const maxHeight = Math.max(frontHeight, backHeight);
+    DOM.cardContainer.style.height = `${Math.max(maxHeight, 200)}px`;
+}
+
 
 /**
  * Orchestre la transition visuelle entre deux cartes.
@@ -124,56 +153,6 @@ export function transitionToNextCard() {
         cardInner.style.opacity = '1';
 
     }, 200); // Doit correspondre à la durée de la transition d'opacité
-}
-
-
-/**
- * Remplit la carte avec le contenu de la question/réponse actuelle.
- * Ne gère plus d'animations, seulement le remplissage.
- */
-// DANS LE FICHIER js/ui.js, remplacez la fonction showCard existante par celle-ci
-
-export function prepareNextCard() {
-    const card = appState.dueCards[appState.currentCardIndex];
-    if (!card) return;
-
-    // ▼▼▼ LA LIGNE MANQUANTE EST ICI ▼▼▼
-    const cardInner = DOM.cardContainer.querySelector('.card-inner');
-
-    const remainingCards = appState.dueCards.length - appState.currentCardIndex;
-    DOM.deckProgressEl.textContent = `À réviser: ${remainingCards}`;
-
-    DOM.cardContainer.focus({ preventScroll: true });
-
-    // Remplit le contenu de la carte
-    let questionText = card.Question;
-    let answerText = card.Réponse;
-    let showFrontFirst = (appState.studyMode === 'recto') || (appState.studyMode === 'aleatoire' && Math.random() < 0.5);
-
-    DOM.cardFront.innerHTML = window.marked.parse(showFrontFirst ? questionText : answerText || '');
-    DOM.cardBack.innerHTML = window.marked.parse(showFrontFirst ? answerText : questionText || '');
-
-    // Met à jour le rendu des formules mathématiques
-    if (window.renderMathInElement) {
-        const options = { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]};
-        window.renderMathInElement(DOM.cardFront, options);
-        window.renderMathInElement(DOM.cardBack, options);
-    }
-    
-    // Ajuste la hauteur de la carte
-    adjustCardHeight();
-}
-
-
-/**
- * Ajuste dynamiquement la hauteur de la carte en fonction de son contenu.
- */
-export function adjustCardHeight() {
-    DOM.cardContainer.style.height = 'auto';
-    const frontHeight = DOM.cardFront.scrollHeight;
-    const backHeight = DOM.cardBack.scrollHeight;
-    const maxHeight = Math.max(frontHeight, backHeight);
-    DOM.cardContainer.style.height = `${Math.max(maxHeight, 200)}px`;
 }
 
 /**

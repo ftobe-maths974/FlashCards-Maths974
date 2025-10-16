@@ -74,51 +74,37 @@ async function startNewSession() {
 /**
  * Gère la réponse de l'utilisateur à une carte.
  */
+// Dans js/main.js
+// Dans js/main.js
+
 function handleCardAnswer(quality) {
     const card = appState.dueCards[appState.currentCardIndex];
     if (!card) return;
 
-    const cardInner = DOM.cardContainer.querySelector('.card-inner');
-    const feedbackMap = { 1: 'feedback-again', 2: 'feedback-hard', 3: 'feedback-good', 4: 'feedback-easy' };
-    
-    // Amélioration : Ajoute le retour visuel et lance la disparition
-    cardInner.classList.add(feedbackMap[quality]);
+    // On cache les boutons immédiatement, sans animation de fondu
     DOM.answerButtons.classList.add(CSS_CLASSES.hidden);
-    cardInner.style.opacity = '0';
+    
+    // Logique SRS
+    processAnswer(card, quality);
+    
+    if (quality <= 2) {
+        const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
+        const insertOffset = Math.floor(Math.random() * 4) + 2;
+        const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
+        appState.dueCards.splice(newIndex, 0, failedCard);
+    } else {
+        appState.currentCardIndex++;
+    }
 
-    // Attend la fin des animations
-    setTimeout(() => {
-        // Nettoie la classe de l'animation pour la prochaine carte
-        cardInner.classList.remove(feedbackMap[quality]);
-        
-        // Applique la logique SRS et détermine la carte suivante
-        processAnswer(card, quality);
-        
-        if (quality <= 2) {
-            const failedCard = appState.dueCards.splice(appState.currentCardIndex, 1)[0];
-            const insertOffset = Math.floor(Math.random() * 4) + 2;
-            const newIndex = Math.min(appState.currentCardIndex + insertOffset, appState.dueCards.length);
-            appState.dueCards.splice(newIndex, 0, failedCard);
-        } else {
-            appState.currentCardIndex++;
-        }
-
-        // Affiche la carte suivante ou le message de fin
-        if (appState.currentCardIndex < appState.dueCards.length) {
-            prepareNextCard();
-            
-            cardInner.style.transition = 'none';
-            DOM.cardContainer.classList.remove(CSS_CLASSES.flipped);
-            
-            void cardInner.offsetWidth; // Force le navigateur à appliquer le changement
-            
-            cardInner.style.transition = 'transform 0.6s, opacity 0.2s';
-            cardInner.style.opacity = '1'; // Fait réapparaître la nouvelle carte
-        } else {
-            DOM.cardContainer.classList.add(CSS_CLASSES.hidden);
-            DOM.noCardsMessage.classList.remove(CSS_CLASSES.hidden);
-        }
-    }, 400); // Délai qui correspond à l'animation CSS
+    // Affichage de la carte suivante ou du message de fin
+    if (appState.currentCardIndex < appState.dueCards.length) {
+        // On retourne la carte côté question et on prépare la suivante, sans transition
+        DOM.cardContainer.classList.remove(CSS_CLASSES.flipped);
+        prepareNextCard();
+    } else {
+        DOM.cardContainer.classList.add(CSS_CLASSES.hidden);
+        DOM.noCardsMessage.classList.remove(CSS_CLASSES.hidden);
+    }
 }
 
 /**

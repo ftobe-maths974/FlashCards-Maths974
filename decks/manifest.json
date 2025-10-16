@@ -89,26 +89,46 @@
           "nom": "🔢 Nombres et calculs",
           "type": "dossier",
           "contenu": [
-                {
-                  "nom": "1.1.Représenter les nombres entiers",
-                  "type": "fichier",
-                  "path": "cycle3/nombres/1.1.representation_entiers.md"
-                },
-                {
-                  "nom": "1.2.Décomposer les nombres entiers",
-                  "type": "fichier",
-                  "path": "cycle3/nombres/1.2.decomposition_entiers.md"
-                },
-                {
-                  "nom": "1.3.Chiffre de, nombre de",
-                  "type": "fichier",
-                  "path": "cycle3/nombres/1.3.chiffre_nombre_de.md"
-                },
-                {
-                  "nom": "1.6.Comparer des entiers",
-                  "type": "fichier",
-                  "path": "cycle3/nombres/1.6.comparaison_entiers.md"
-                }  
+              {
+                "nom": "1.1.Représenter les nombres entiers",
+                "type": "fichier",
+                "path": "cycle3/nombres/1.1.representation_entiers.md"
+              },
+              {
+                "nom": "1.2.Décomposer les nombres entiers",
+                "type": "fichier",
+                "path": "cycle3/nombres/1.2.decomposition_entiers.md"
+              },
+              {
+                "nom": "1.3.Chiffre de, nombre de",
+                "type": "fichier",
+                "path": "cycle3/nombres/1.3.chiffre_nombre_de.md"
+              },
+              {
+                "nom": "1.6.Comparer des entiers",
+                "type": "fichier",
+                "path": "cycle3/nombres/1.6.comparaison_entiers.md"
+              },
+              {
+                "nom": "1.7.Ordonner des entiers",
+                "type": "fichier",
+                "path": "cycle3/nombres/1.7.ordonner_entiers.md"
+              },
+              {
+                "nom": "2.1.Représenter les fractions simples",
+                "type": "fichier",
+                "path": "cycle3/nombres/2.1.representer_fractions_simples.md"
+              },
+              {
+                "nom": "2.2.Représenter les fractions impropres",
+                "type": "fichier",
+                "path": "cycle3/nombres/2.2.representer_fractions_impropres.md"
+              },
+              {
+                "nom": "2.5.Graduer et placer des fractions",
+                "type": "fichier",
+                "path": "cycle3/nombres/2.5.graduer_placer_fractions.md"
+              }
             ]
           }
       ]
